@@ -1,7 +1,7 @@
 import { Actor, Identity } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import { html, render } from "lit-html";
-import { canisterId, createActor } from "../../../declarations/whoami";
+import { canisterId, createActor } from "../declarations/whoami";
 import { renderLoggedIn } from "./loggedIn";
 import { defaultOptions } from "..";
 
