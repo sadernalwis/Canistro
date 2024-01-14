@@ -1,0 +1,97 @@
+
+.medusa-darkmode-skin{
+    background-color: rgb(0, 0, 0);
+	line-height: 1.2;
+	font-family: "Rajdhani", sans-serif;
+}
+.medusa-darkmode-arrow {
+
+    background-color: rgb(0, 0, 0);
+	position: absolute;
+	display: inline-block;
+	top: 11%;
+	bottom: 0px;
+	width: 4em;
+	transform: rotate(30deg) skewY(30deg);
+	border-right: medium solid;
+	border-top: medium solid;
+	pointer-events: none;
+	box-sizing: border-box;
+	/* box-shadow: gray 3px -3px 6px -3px; */
+    border-color: rgb(77, 78, 79) ;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide_scrollbars_CSO::-webkit-scrollbar {
+display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide_scrollbars_FIE {
+-ms-overflow-style: none;  /* IE and Edge */
+scrollbar-width: none;  /* Firefox */
+} 
+  
+.medusa-darkmode-skin-border{
+    background-color: rgb(33, 35, 37);
+}
+
+.medusa-darkmode-noshadow{
+	font-family: "Rajdhani", sans-serif;
+    color:rgb(216, 216, 216);
+    background-color: rgb(0, 0, 0);
+}
+.medusa-darkmode-transparent{
+	font-family: "Rajdhani", sans-serif;
+    color:rgb(216, 216, 216);
+}
+.medusa-darkmode-code {
+    font-family: "Rajdhani", monospace;
+    color: rgb(216, 216, 216);
+    /* background-color: rgb(33, 35, 37); */
+    box-shadow: rgb(52 56 58 / 0%) 20px 15px 20px, rgb(0 0 0 / 48%) -3px 20px 20px;
+}
+.medusa-darkmode-graph{
+	font-family: "Rajdhani", monospace;
+    color:rgb(216, 216, 216);
+    background-color: rgb(33, 35, 37);
+	border-top: 1px solid;
+	border-color: #000;
+
+}
+
+.medusa-darkmode{
+	font-family: "Rajdhani", sans-serif;
+    color:rgb(216, 216, 216);
+    background-color: rgb(33, 35, 37);
+    background-image: none;
+    box-shadow: rgb(52, 56, 58) 14px 14px 20px, rgb(24, 26, 27) -14px -14px 20px;
+}
+
+::-moz-selection { /* Code for Firefox */
+	color: black;
+	background: limegreen;
+	border-radius: 2px;
+}
+
+::selection {
+	color: black;
+	background: limegreen;
+	border-radius: 2px;
+}
+.filterit{ /* https://stackoverflow.com/questions/24933430/img-src-svg-changing-the-styles-with-css */
+	width:270px;
+	filter: invert(88%) sepia(21%) saturate(935%) hue-rotate(123deg) brightness(85%) contrast(97%);
+}
+
+.startAsBlack{
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	background: black;
+}
+/* https://codepen.io/sosuke/pen/Pjoqqp?__cf_chl_jschl_tk__=ecc0b72797ae71bc009d6322e3e470773936b386-1604211766-0-ASpz720gXnc6Ej0vzlgY9-KLmlPkldgcOx1wAmGTUCjLZLOxkArNxpRzZ9m8woL-NGmP9LBGVPws8UxMJZrR7O1qFH6QkKtrGVPw6StRnXiK1XTQR_nY905r0XobAG2nOmyC6Zq8mdyPDp1MyHD7JLodJUXCRViXhtmLmRVE_-JGarVJRlxs6k3DzAOQQEJewfp00DjhlD0mxr8ZKpk2yq6IPTZZQ52XYxh26FC5MxLHhs7LuAwhtolmDZyp4_IuwRg8I5m-2--MmvGE8CCqjRWrkE85zgkMXPlOqcZtppRpZhn6Uz9DZAuKheHwVBb0ySIhFYG92bvQOgiKX0TTswB1SHgOLIeqktuyUaAgxI_h   */
+.black-green{ filter: invert(43%) sepia(96%) saturate(1237%) hue-rotate(88deg) brightness(128%) contrast(119%); }  
+.black-red{ filter: invert(37%) sepia(93%) saturate(7471%) hue-rotate(356deg) brightness(91%) contrast(135%); }  
+.black-blue{ filter: invert(12%) sepia(83%) saturate(5841%) hue-rotate(244deg) brightness(87%) contrast(153%); }
+.black-purple{ filter: invert(18%) sepia(98%) saturate(2657%) hue-rotate(289deg) brightness(121%) contrast(140%); }

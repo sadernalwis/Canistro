@@ -8,8 +8,7 @@ const content = () => html`<div class="container">
   <style>
     #whoami {
       border: 1px solid #1a1a1a;
-      margin-bottom: 1rem;
-    }
+      margin-bottom: 1rem; }
   </style>
   <h1>Internet Identity Client</h1>
   <h2>You are authenticated!</h2>
@@ -19,26 +18,15 @@ const content = () => html`<div class="container">
   <button id="logout">log out</button>
 </div>`;
 
-export const renderLoggedIn = (
-  actor: ActorSubclass<_SERVICE>,
-  authClient: AuthClient
-) => {
-  render(content(), document.getElementById("pageContent") as HTMLElement);
-
-  (document.getElementById("whoamiButton") as HTMLButtonElement).onclick =
-    async () => {
-      try {
-        const response = await actor.whoami();
-        (document.getElementById("whoami") as HTMLInputElement).value =
-          response.toString();
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-  (document.getElementById("logout") as HTMLButtonElement).onclick =
-    async () => {
-      await authClient.logout();
-      renderIndex(authClient);
-    };
-};
+export const renderLoggedIn = ( actor: ActorSubclass<_SERVICE>, authClient: AuthClient ) => {
+	render(content(), document.getElementById("pageContent") as HTMLElement);
+	(document.getElementById("whoamiButton") as HTMLButtonElement).onclick =
+		async () => {
+			try {
+				const response = await actor.whoami();
+				(document.getElementById("whoami") as HTMLInputElement).value = response.toString(); } 
+			catch (error) { console.error(error); } };
+	(document.getElementById("logout") as HTMLButtonElement).onclick =
+		async () => {
+			await authClient.logout();
+			renderIndex(authClient); }; };

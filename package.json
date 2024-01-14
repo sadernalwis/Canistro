@@ -10,10 +10,10 @@
     "Canister"
   ],
   "scripts": {
+    "build:vanilla": "vite build Medusa --config vite.config.js",
     "build": "npm run build:vanilla",
-    "build:vanilla": "vite build vanilla --config vite.config.js",
     "prebuild": "npm run generate",
-    "start": "vite vanilla --config vite.config.js",
+    "start": "vite Medusa --config vite.config.js",
     "start:dfx": "dfx start --background --clean --host \"127.0.0.1:4943\"",
     "prestart": "npm run generate",
     "release": "node release.mjs",
@@ -44,8 +44,11 @@
     "@dfinity/candid": "^0.20.2",
     "@dfinity/identity": "^0.20.2",
     "@dfinity/principal": "^0.20.2",
+    "@tweenjs/tween.js": "^21.0.0",
+    "bluebird": "^3.7.2",
     "lit-html": "^2.4.0",
     "pinia": "^2.0.36",
+    "three": "^0.160.0",
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.4"
   }

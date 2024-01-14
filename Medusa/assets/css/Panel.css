@@ -1,0 +1,188 @@
+.bordered{
+	border: 1px white solid; 
+	border-radius: 5px;
+}
+
+.grid {
+	/* background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat; */
+	background: linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0%, rgba(17, 17, 17, 0) 100%), url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+}
+.container {
+	/* background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat; */
+	/* background: linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0%, rgba(17, 17, 17, 0) 100%), url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat; */
+	/* background: linear-gradient(0deg, rgba(245, 213, 70, 0.1) 0%, rgba(17, 17, 17, 0) 100%) , url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat; */
+	display: flex;
+	height: 100%;
+	font-family: "Barlow", sans-serif;
+	font-size: 14px;
+	font-weight: 500;
+	color: #fff;
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	background-color: white;
+	/* background-color: #f5d546; */
+	padding: 0 5px 3px 5px;
+	color: #111111;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	font-size: 32px;
+	letter-spacing: 2px;
+	margin: 20px 0 10px;
+	/* border: 1px #f5d546 solid; */
+	border: 1px white solid;
+	border-radius: 5px;
+}
+
+h1,
+p,
+.shot .title::before {
+	font-weight: 500;
+}
+
+p,
+.shot .title::before {
+	opacity: 0.3;
+	margin: 0 0 10px 0;
+	letter-spacing: 1px;
+}
+
+a {
+	color: white;
+	/* color: #f5d546; */
+}
+
+a:hover {
+	background: white;
+	/* background: #f5d546; */
+	color: #111;
+	text-decoration: none;
+}
+
+.shot {
+	width: 400px;
+	/* margin: auto; */
+	position: absolute;
+	margin-left: 10%;
+	margin-top: 5%;
+	display: block;
+	height: 100%;
+}
+
+.shot .card {
+	/* width: 100%; */
+	width: 600px;
+	height: 600px;
+	display: flex;
+	background: linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0%, rgba(17, 17, 17, 0) 100%);
+	/* background: linear-gradient(0deg, rgba(245, 213, 70, 0.1) 0%, rgba(17, 17, 17, 0) 100%); */
+	border: 1px white solid;
+	/* border: 1px #f5d546 solid; */
+	border-radius: 5px;
+	-webkit-animation: entrance 400ms 800ms linear backwards 1;
+	animation: entrance 400ms 800ms linear backwards 1;
+}
+
+.shot .card #component {
+	margin: auto;
+}
+#component {
+	position: relative;
+}
+.shot .description {
+	-webkit-animation: entrance 400ms 1000ms linear backwards 1;
+	animation: entrance 400ms 1000ms linear backwards 1;
+}
+
+.shot .title {
+	height: 100%;
+	width: 5px;
+	position: absolute;
+	top: 0;
+	left: -20px;
+	background: white linear-gradient(33deg, rgb(0 0 0 / 0%) 0%, rgba(17, 17, 17, 0) 100%);
+	/* background: #f5d546 linear-gradient(33deg, rgb(0 0 0 / 0%) 0%, rgba(17, 17, 17, 0) 100%); */
+	-webkit-animation: entrance 400ms 1200ms linear backwards 1;
+	animation: entrance 400ms 1200ms linear backwards 1;
+}
+
+.shot .title::before {
+	content: "SAT No #XXXXXX";
+	text-transform: uppercase;
+	text-align: right;
+	position: absolute;
+	left: -92px;
+	top: -17px;
+	transform-origin: 100% 100%;
+	transform: rotateZ(-90deg);
+}
+
+.shot .options {
+	width: 200px;
+	height: auto;
+	display: flex;
+	flex-wrap: wrap;
+	position: static;
+	top: 0;
+	right: -220px;
+	-webkit-animation: entrance 400ms 1400ms linear backwards 1;
+	animation: entrance 400ms 1400ms linear backwards 1;
+}
+
+.shot .options button {
+	height: 40px;
+	padding: 0 10px;
+	margin: 0 10px 15px 0;
+	border: 2px #111 solid;
+	outline: 1px white solid;
+	/* outline: 1px #f5d546 solid; */
+	background-color: transparent;
+	font-size: 14px;
+	letter-spacing: 1px;
+	color: #fff;
+	cursor: pointer;
+	transition: 300ms all ease-out;
+}
+
+.shot .options button:hover,
+.shot .options button:focus,
+.shot .options button.active {
+	/* background-color: rgba(245, 213, 70, 0.5); */
+	background-color: gray;
+}
+
+.shot .options button.active {
+	border: 2px white solid;
+	/* border: 2px #f5d546 solid; */
+	background-color: white;
+	/* background-color: #f5d546; */
+	color: #111111;
+}
+
+@keyframes entrance {
+
+	to,
+	20%,
+	40%,
+	60%,
+	80% {
+		opacity: 1;
+	}
+
+	from,
+	10%,
+	30%,
+	50%,
+	70%,
+	90% {
+		opacity: 0;
+	}
+}
+
+.eye {
+	filter: invert(1);
+	animation: 5s ease-out 0s infinite normal none running pulsate;
+	padding: 5px;
+}

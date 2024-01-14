@@ -3,7 +3,7 @@
 		"whoami": {
 			"main": "whoami/main.mo",
 			"type": "motoko",
-			"declarations": { "node_compatibility": true, "output": "vanilla/declarations/whoami" },
+			"declarations": { "node_compatibility": true, "output": "Medusa/Canistro/Declarations/whoami" },
 			"pullable": {
 				"dependencies": [],
 				"wasm_url": "https://github.com/krpeacock/auth-client-demo/releases/latest/download/whoami.wasm",
@@ -13,7 +13,7 @@
 			"#build": "yarn build",
 			"source": [ "dist" ],
 			"type": "assets",
-			"declarations": { "node_compatibility": true, "output": "Declarations/frontend" },
+			"declarations": { "node_compatibility": true, "output": "Medusa/Canistro/Declarations/frontend" },
 			"frontend": { "entrypoint": "dist/index.html" } } },
 	"defaults": { "build": { "args": "", "packtool": "" } },
 	"output_env_file": ".env",

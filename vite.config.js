@@ -5,22 +5,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
-  root: path.resolve(__dirname, "vanilla"),
-  build: { outDir: path.resolve( __dirname,"dist"), emptyOutDir: true, },
-  define: {
-    global: "window",
-  },
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:4943",
-        changeOrigin: true,
-      },
-    },
-  },
-  plugins: [
-    EnvironmentPlugin("all", { prefix: "CANISTER_" }),
-    EnvironmentPlugin("all", { prefix: "DFX_" }),
-    EnvironmentPlugin({ BACKEND_CANISTER_ID: "" }),
-  ],
-});
+	root: path.resolve(__dirname, "Medusa"),
+	build: { outDir: path.resolve(__dirname, "dist"), emptyOutDir: true, },
+	resolve: { alias: { Medusa: "Medusa", }, },
+	define: { global: "window", },
+	server: { proxy: { "/api": { target: "http://localhost:4943", changeOrigin: true, }, }, },
+	plugins: [
+		EnvironmentPlugin("all", { prefix: "CANISTER_" }),
+		EnvironmentPlugin("all", { prefix: "DFX_" }),
+		EnvironmentPlugin({ BACKEND_CANISTER_ID: "" }),], });

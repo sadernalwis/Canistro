@@ -1,0 +1,1414 @@
+
+
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="author" content="Peter Collingridge">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <title>Draggable SVG elements</title>
+        
+        <meta property="og:site_name" content="petercollingridge.co.uk" />
+        <meta property="og:type" content="website" /> 
+        <meta property="og:url" content="http://petercollingridge.co.uk/tutorials/svg/interactive/dragging/" />
+        <meta property="og:title" content="Draggable SVG elements" />
+
+      
+        <meta name="description" content="A step-by-step guide to making SVG elements draggable." />
+        <meta property="og:description" content="A step-by-step guide to making SVG elements draggable." />
+      
+
+      
+        
+        <meta property="og:image" content="http://petercollingridge.co.ukhttps://media.petercollingridge.co.uk/images/Screen_Shot_2019-01-06_at_21.39.50.width-400.png" />
+        <meta property="og:image:width" content="400" />
+        <meta property="og:image:height" content="267" />
+      
+
+        
+
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" href="/static/css/font-awesome.min.bf0c425cdb73.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/base.5b0ea2f049b9.css">
+        <link href='https://fonts.googleapis.com/css?family=Alegreya+Sans+SC:500|Josefin+Sans:300,600' rel='stylesheet' type='text/css'>
+        <link rel="shortcut icon" href="https://wagtail.petercollingridge.co.uk/favicon.ico" />
+
+        
+    <link rel="stylesheet" type="text/css" href="/static/css/ajaxcomments.css"/>
+
+        
+        
+    
+    </head>
+
+    <body class="article-body">
+        <div id="body">
+            
+
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                  <li class="nav-item active"><a class="nav-link" href="/">
+                    <i class="navbar-brand fa fa-home"></i> <span class="sr-only">(current)</span>
+                  </a></li>
+                  <li class="nav-item"><a class="nav-link" href="/tutorials">Tutorials</a></li>
+                  <li class="nav-item"><a class="nav-link" href="/blog">Articles</a></li>
+                  <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
+                  <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0" action="/search/" method="get">
+                  <input class="form-control mr-sm-2" type="text" name="query" value="" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline my-2 my-sm-0" type="submit">Search</button>
+                </form>
+              </div>
+            </nav>
+
+            <main role="main" class="container">
+              <h1>Draggable SVG elements</h1>
+              <div class="content">
+
+    <div class="row">
+    <div class="col-4">
+        
+            <a href="/tutorials/svg/interactive/tooltip/">
+                <span class="naviagation-arrow"><i class="fa fa-caret-left" aria-hidden="true"></i></span>
+                <span class="navigation-name">Tooltip</span>
+            </a>
+        
+    </div>
+    <div class="col-4 parent-page-link">
+        <a href="/tutorials/svg/interactive/">
+            
+                Interactive SVGs
+            
+        </a>
+    </div>
+    <div class="col-4 next-page-link">
+        
+            <a href="/tutorials/svg/interactive/pan-and-zoom/">
+                <span class="navigation-name">Panning and zooming</span>
+                <span class="naviagation-arrow"><i class="fa fa-caret-right" aria-hidden="true"></i></span>
+            </a>
+        
+    </div>
+</div>
+
+    <hr>
+
+    
+    <div class="info-header">
+        
+            <span class="date">3 Apr 2018</span>
+        
+
+        
+            <span class="github-link">
+                <a href="https://github.com/petercollingridge/code-for-blog/tree/master/svg-interaction/draggable" target="_blank">
+                    <i class="fa fa-github"></i> <span>Code on Github</span>
+                </a>
+            </span>
+        
+    </div>
+
+
+    <article>
+        
+
+
+    
+        
+            <h2>Introduction</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>[This is a completely rewritten version of a post from 1st September 2011]</p><p>One of the most common forms of interaction on a computer is clicking and dragging. I use it a lot for interactive demos, such as those in my <a href="/tutorials/svg/basics/">SVG tutorial</a>, and have a built <a href="/tools/interactivesvgjs/">a library</a> for making simple draggable SVG diagrams.</p><p>You can find the code for all the examples on this page <a href="https://github.com/petercollingridge/code-for-blog/tree/master/svg-interaction/draggable">here</a>. This article builds up the code required step-by-step, explaining why each element is needed. If you only care about finished code, you can find it <a href="https://raw.githubusercontent.com/petercollingridge/code-for-blog/master/svg-interaction/draggable/draggable_6.svg">here</a>.</p></div>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>This is the SVG I&#x27;m going to build on this page. It&#x27;s relatively simple, but it demonstrates the code works with different element types. Some of the elements have transformations applied to them. For example, the star is rotated. There is also a static rect element which can&#x27;t be dragged.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" onload="makeDraggable(evt)">
+    <style>
+      .background {
+        fill: #eee;
+      }
+      .static {
+        cursor: not-allowed;
+      }
+      .draggable {
+        cursor: move;
+      }
+    </style>
+    
+    <script type="text/javascript"><![CDATA[
+      function makeDraggable(evt) {
+        var svg = evt.target;
+        svg.addEventListener('mousedown', startDrag, false);
+        svg.addEventListener('mousemove', drag, false);
+        svg.addEventListener('mouseup', endDrag, false);
+        svg.addEventListener('mouseleave', endDrag);
+
+        function getMousePosition(evt) {
+          var CTM = svg.getScreenCTM();
+          return {
+            x: (evt.clientX - CTM.e) / CTM.a,
+            y: (evt.clientY - CTM.f) / CTM.d
+          };
+        }
+
+        var selectedElement, offset, transform;
+
+        function startDrag(evt) {
+          if (evt.target.classList.contains('draggable')) {
+            selectedElement = evt.target;
+            offset = getMousePosition(evt);
+
+            // Make sure the first transform on the element is a translate transform
+            var transforms = selectedElement.transform.baseVal;
+
+            if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+              // Create an transform that translates by (0, 0)
+              var translate = svg.createSVGTransform();
+              translate.setTranslate(0, 0);
+              selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+            }
+
+            // Get initial translation
+            transform = transforms.getItem(0);
+            offset.x -= transform.matrix.e;
+            offset.y -= transform.matrix.f;
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+            var coord = getMousePosition(evt);
+            transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = false;
+        }
+      }
+    ]]> </script>
+    
+    <rect class="background" x="0" y="0" width="30" height="20"/>
+    <rect class="static" fill="#888" x="2" y="4" width="6" height="2"/>
+    <rect class="draggable" fill="#007bff" x="2" y="4" width="6" height="2" transform="rotate(90, 5, 5) translate(10, 0)"/>
+    <ellipse class="draggable" fill="#ff00af" cx="5" cy="5" rx="3" ry="2" transform="translate(10, 0)"/>
+    <polygon class="draggable" fill="#ffa500" transform="rotate(15, 15, 15)" points="16.9 15.6 17.4 18.2 15 17 12.6 18.2 13.1 15.6 11.2 13.8 13.8 13.4 15 11 16.2 13.4 18.8 13.8"/>
+    <path class="draggable" stroke="#2bad7b" stroke-width="0.5" fill="none" d="M1 5C5 1 5 9 9 5" transform="translate(20)"/>
+    <text class="draggable" x="25" y="15" text-anchor="middle" font-size="3px" alignment-baseline="middle">Drag</text>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <h2>SVG setup</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Let&#x27;s start with a simple SVG with two <b>rect</b> element, one we want to be draggable and another we don&#x27;t.</p></div>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <pre class="prettyprint linenums"><code class="language-XML">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot;
+viewBox=&quot;0 0 30 20&quot;&gt;
+  &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;30&quot; height=&quot;20&quot; fill=&quot;#fafafa&quot;/&gt;
+  &lt;rect x=&quot;4&quot; y=&quot;5&quot; width=&quot;8&quot; height=&quot;10&quot; fill=&quot;#007bff&quot;/&gt;
+  &lt;rect x=&quot;18&quot; y=&quot;5&quot; width=&quot;8&quot; height=&quot;10&quot;   fill=&quot;#888&quot;/&gt;
+&lt;/svg&gt;</code></pre>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg"
+viewBox="0 0 30 20">
+  <rect x="0" y="0" width="30" height="20" class="background"/>
+  <rect x="4" y="5" width="8" height="10" fill="#007bff"/>
+  <rect x="18" y="5" width="8" height="10" fill="#888"/>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <h2>CSS</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>First give the <b>rect</b> we want to make draggable the class &quot;draggable&quot;. We can give the other <b>rect</b> the class static. We can then give the user an idea about what they can interactive with by changing the cursor when they mouseover each element</p></div>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <pre class="prettyprint linenums:8"><code class="language-CSS">.static {
+  cursor: not-allowed;
+}
+.draggable {
+  cursor: move;
+}</code></pre>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg"
+viewBox="0 0 30 20">
+  <rect x="0" y="0" width="30" height="20" class="background"/>
+  <rect class="draggable" x="4" y="5" width="8" height="10" fill="#007bff""/>
+  <rect class="static" x="18" y="5" width="8" height="10" fill="#888"/>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <h2>Javascript outline</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>The click-and-drag interaction has two obvious parts: click and drag, but really there are three:</p><ul><li><b>Pressing the mouse</b>, when we need to find what element, if any, we have pressed on.</li><li><b>Dragging the mouse</b>, when we need to move the element.</li><li><b>Releasing the mouse</b>, when we need to release the element so it doesn&#x27;t continue to move when we move the mouse.</li></ul><p>This is fairly straightforward but there a bit of subtlety required to get it right.</p><p>Let&#x27;s start by making a <b>makeDraggable</b> function. This can be in a separate Javascript file or in a script element inside the SVG itself. We call this function when the to the SVG element loads, passing in the load event:</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums"><code class="language-XML">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot;
+     viewBox=&quot;0 0 30 20&quot;
+     onload=&quot;makeDraggable(evt)&quot;&gt;</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>This function itself gets the SVG element as the event target and binds event listeners to <b>mousedown</b>, <b>mousemove</b>,<b> mouseup</b>, and <b>mouseleave</b> events on the SVG element.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums"><code class="language-javascript">function makeDraggable(evt) {
+  var svg = evt.target;
+  svg.addEventListener(&#39;mousedown&#39;, startDrag);
+  svg.addEventListener(&#39;mousemove&#39;, drag);
+  svg.addEventListener(&#39;mouseup&#39;, endDrag);
+  svg.addEventListener(&#39;mouseleave&#39;, endDrag);
+
+  function startDrag(evt) {
+  }
+
+  function drag(evt) {
+  }
+
+  function endDrag(evt) {
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <h2>Selecting an element</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Let&#x27;s test that we can select and deselect an element. First create a variable <b>selectedElement</b> and set it to <b>null</b> (or something falsy). We add it outside of the dragging function so they can all refer to it, but inside <b>makeDraggable</b> so it&#x27;s not global.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:7"><code class="language-javascript">var selectedElement = false;</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Our <b>startDrag</b> function should test whether the target of the mousedown event it&#x27;s passed has the class <b>draggable</b>, and if so set <b>selectedElement</b> to that element.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:9"><code class="language-javascript">function startDrag(evt) {
+  if (evt.target.classList.contains(&#39;draggable&#39;)) {
+    selectedElement = evt.target;
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>For now, we&#x27;ll just make the <b>drag</b> function increment the <b>x</b> attribute of the selected element. Note that we use <b>getAttributeNS</b> and <b>setAttributeNS</b> when use SVG elements. We also have to make sure we convert the attribute into a float before we add 0.1 to it.</p><p>I&#x27;ve also add <b>evt.preventDefault();</b> which blocks any other dragging behaviour. For example, in the SVG at the top of the page, if you drag an element over the text element, it won&#x27;t highlight the text.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:15"><code class="language-javascript">function drag(evt) {
+  if (selectedElement) {
+    evt.preventDefault();
+    var x = parseFloat(selectedElement.getAttributeNS(null, &quot;x&quot;));
+    selectedElement.setAttributeNS(null, &quot;x&quot;, x + 0.1);
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>The <b>endDrag</b> function just needs to set <b>selectedElement</b> back to <b>null</b>, so we don&#x27;t keep moving it once the mouse has been released.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:23"><code class="language-javascript">function endDrag(evt) {
+  selectedElement = null;
+}</code></pre>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Now we can click on the draggable (blue) rect, and when we move the mouse, it will slide right. Clicking the static rect and dragging the mouse has no effect.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" onload="makeSlideable(evt)">    
+    <script type="text/javascript"><![CDATA[
+      function makeSlideable(evt) {
+        var svg = evt.target;
+        svg.addEventListener('mousedown', startDrag);
+        svg.addEventListener('mousemove', drag);
+        svg.addEventListener('mouseup', endDrag);
+        svg.addEventListener('mouseleave', endDrag);
+
+        var selectedElement = null;
+        function startDrag(evt) {
+          if (evt.target.classList.contains('draggable')) {
+            selectedElement = evt.target;
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+            var x = parseFloat(selectedElement.getAttributeNS(null, "x"));
+            selectedElement.setAttributeNS(null, "x", x + 0.1);
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = null;
+        }
+      }
+    ]]></script>
+    
+  <rect x="0" y="0" width="30" height="20" class="background"/>
+  <rect class="draggable" x="4" y="5" width="8" height="10" fill="#007bff"/>
+  <rect class="static" x="18" y="5" width="8" height="10" fill="#888"/>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <h2>Dragging an element</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Now let&#x27;s try to actually move the rect with the mouse. We can get the position of the mouse using <b>evt.clientX</b> and <b>evt.clientY</b>, and use these to update the coordinates of the element.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:15"><code class="language-javascript">function drag(evt) {
+  if (selectedElement) {
+    evt.preventDefault();
+    var dragX = evt.clientX;
+    var dragY = evt.clientY;
+    selectedElement.setAttributeNS(null, &quot;x&quot;, dragX);
+    selectedElement.setAttributeNS(null, &quot;y&quot;, dragY);
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Now if you click and drag the rect, you&#x27;ll find that it... disappears, or goes somewhere unexpected.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" onload="makeDraggable2(evt)">    
+    <script type="text/javascript"><![CDATA[
+      function makeDraggable2(evt) {
+        var svg = evt.target;
+        svg.addEventListener('mousedown', startDrag);
+        svg.addEventListener('mousemove', drag);
+        svg.addEventListener('mouseup', endDrag);
+        svg.addEventListener('mouseleave', endDrag);
+
+        var selectedElement = null;
+        function startDrag(evt) {
+          if (evt.target.classList.contains('draggable')) {
+            selectedElement = evt.target;
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+            var dragX = evt.clientX;
+            var dragY = evt.clientY;
+            selectedElement.setAttributeNS(null, "x", dragX);
+            selectedElement.setAttributeNS(null, "y", dragY);
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = null;
+        }
+      }
+    ]]> </script>
+    
+  <rect x="0" y="0" width="30" height="20" class="background"/>
+  <rect class="draggable" x="4" y="5" width="8" height="10" fill="#007bff"/>
+  <rect class="static" x="18" y="5" width="8" height="10" fill="#888"/>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><h3>Fixing the coordinates</h3><p>The problem is that <b>clientX</b> and <b>clientY</b> give the mouse coordinates using the screen coordinate system (which will be something like 300 x 200 pixels, though it depends on how you&#x27;re viewing the page, since the images are responsive). We need to know the coordinates in SVG space, which is defined by the <b>viewBox</b> attribute, in this case 30 x 20.</p><p>To find out how to convert from the screen coordinate system to the SVG coordinate system, we can use the <b>getScreenCTM</b> method of the svg element. This returns the <b>C</b>urrent <b>T</b>ransformation <b>M</b>atrix for the screen, which is an object with six keys, a, b, c, d, e, f.</p><p>It&#x27;s not too important what these values represent; in most cases all we need to know is that if an element has attributes of $(x, y)$, then it will have coordinates on screen of $(ax + e, dy + f)$. So to find the position of the mouse in SVG space, we just calculate the inverse. So let&#x27;s add a function to do that:</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:9"><code class="language-javascript">function getMousePosition(evt) {
+  var CTM = svg.getScreenCTM();
+  return {
+    x: (evt.clientX - CTM.e) / CTM.a,
+    y: (evt.clientY - CTM.f) / CTM.d
+  };
+}</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Then the drag function becomes:</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:17"><code class="language-javascript">function drag(evt) {
+  if (selectedElement) {
+    evt.preventDefault();
+    var coord = getMousePosition(evt);
+    selectedElement.setAttributeNS(null, &quot;x&quot;, coord.x);
+    selectedElement.setAttributeNS(null, &quot;y&quot;, coord.y);
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Now when you drag, the rect element moves with your mouse.</p><p>Unfortunately, it positions the corner of the rect where your mouse is, even if you select the center of the rect.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" onload="makeDraggable3(evt)">    
+    <script type="text/javascript"><![CDATA[
+      function makeDraggable3(evt) {
+        var svg = evt.target;
+        svg.addEventListener('mousedown', startDrag);
+        svg.addEventListener('mousemove', drag);
+        svg.addEventListener('mouseup', endDrag);
+        svg.addEventListener('mouseleave', endDrag);
+
+        var selectedElement = null;
+        function startDrag(evt) {
+          if (evt.target.classList.contains('draggable')) {
+            selectedElement = evt.target;
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+            var CTM = svg.getScreenCTM();
+            var dragX = (evt.clientX - CTM.e) / CTM.a;
+            var dragY = (evt.clientY - CTM.f) / CTM.d;
+            selectedElement.setAttributeNS(null, "x", dragX);
+            selectedElement.setAttributeNS(null, "y", dragY);
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = null;
+        }
+      }
+    ]]> </script>
+    
+  <rect x="0" y="0" width="30" height="20" class="background"/>
+  <rect class="draggable" x="4" y="5" width="8" height="10" fill="#007bff"/>
+  <rect class="static" x="18" y="5" width="8" height="10" fill="#888"/>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><h3>Fixing dragging</h3><p>There are a couple of ways we could fix the dragging issue. I think the easiest is to calculate the offset from where the mouse is first clicked at the top left of the rect. Then, when we set the coordinates of the rect, we can subtract that value.</p><p>So calculate the offset in the <b>startDrag</b> function:</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:16"><code class="language-javascript">var selectedElement, offset;
+
+function startDrag(evt) {
+  if (evt.target.classList.contains(&#39;draggable&#39;)) {
+    selectedElement = evt.target;
+    offset = getMousePosition(evt);
+    offset.x -= parseFloat(selectedElement.getAttributeNS(null, &quot;x&quot;));
+    offset.y -= parseFloat(selectedElement.getAttributeNS(null, &quot;y&quot;));
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>And then remove the offset in the <b>drag</b> function.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:27"><code class="language-javascript">function drag(evt) {
+  if (selectedElement) {
+    evt.preventDefault();
+    var coord = getMousePosition(evt);
+    selectedElement.setAttributeNS(null, &quot;x&quot;, coord.x - offset.x);
+    selectedElement.setAttributeNS(null, &quot;y&quot;, coord.y - offset.y);
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Now everything should work perfectly.</p><p>Until...</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" onload="makeDraggable4(evt)">    
+    <script type="text/javascript"><![CDATA[
+      function makeDraggable4(evt) {
+        var svg = evt.target;
+        svg.addEventListener('mousedown', startDrag);
+        svg.addEventListener('mousemove', drag);
+        svg.addEventListener('mouseup', endDrag);
+        svg.addEventListener('mouseleave', endDrag);
+
+        function getMousePosition(evt) {
+          var CTM = svg.getScreenCTM();
+          return {
+            x: (evt.clientX - CTM.e) / CTM.a,
+            y: (evt.clientY - CTM.f) / CTM.d
+          };
+        }
+
+        var selectedElement, offset;
+
+        function startDrag(evt) {
+          if (evt.target.classList.contains('draggable')) {
+            selectedElement = evt.target;
+            offset = getMousePosition(evt);
+            offset.x -= parseFloat(selectedElement.getAttributeNS(null, "x"));
+            offset.y -= parseFloat(selectedElement.getAttributeNS(null, "y"));
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+            var coord = getMousePosition(evt);
+            selectedElement.setAttributeNS(null, "x", coord.x - offset.x);
+            selectedElement.setAttributeNS(null, "y", coord.y - offset.y);
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = null;
+        }
+      }
+    ]]> </script>
+    
+  <rect x="0" y="0" width="30" height="20" class="background"/>
+  <rect class="draggable" x="4" y="5" width="8" height="10" fill="#007bff"/>
+  <rect class="static" x="18" y="5" width="8" height="10" fill="#888"/>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <h2>Dragging other elements</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>As we&#x27;ve written it, the <b>drag</b> function works by updating the <b>x</b> and <b>y</b> attributes of the selected element. Unfortunately, most elements don&#x27;t have <b>x</b> and <b>y</b> attributes. In order to make the function universal, we need to use transforms.</p><p>Working with transforms is a little tricky. I did write <a href="https://raw.githubusercontent.com/petercollingridge/code-for-blog/master/svg-interaction/draggable/draggable_regex.svg">a version that uses regex</a> to parse the transform attribute for elements, which is a bit hacky, but might be easier to understand. It also might not work if the target element has some convoluted set of transformations already applied.</p><p>The version here is better, but might not work on all browsers. The idea is to calculate the offset from the first transform on the element, which should be a translate transform. If the first transform is not a translation, or the element doesn&#x27;t have a transform, then we add one.</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:16"><code class="language-javascript">var selectedElement, offset, transform;
+
+function startDrag(evt) {
+  if (evt.target.classList.contains(&#39;draggable&#39;)) {
+    selectedElement = evt.target;
+    offset = getMousePosition(evt);
+
+    // Get all the transforms currently on this element
+    var transforms = selectedElement.transform.baseVal;
+
+    // Ensure the first transform is a translate transform
+    if (transforms.length === 0 ||
+        transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+      // Create an transform that translates by (0, 0)
+      var translate = svg.createSVGTransform();
+      translate.setTranslate(0, 0);
+
+      // Add the translation to the front of the transforms list
+      selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+    }
+
+    // Get initial translation amount
+    transform = transforms.getItem(0);
+    offset.x -= transform.matrix.e;
+    offset.y -= transform.matrix.f;
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>The drag function then updates the translation transform to the mouse position minus the offset:</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:42"><code class="language-javascript">function drag(evt) {
+  if (selectedElement) {
+    evt.preventDefault();
+    var coord = getMousePosition(evt);
+    transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+  }
+}</code></pre>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Now we have a <b>makeDraggable</b> function that should work on any element regardless of its type and the transformations applied to it.</p><p>The order of the elements stays the same, so the ellipse will always be in front of the rect elements, but behind the others. I&#x27;ll write a separate tutorial on how to move elements up and down in the z-axis.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" onload="makeDraggable(evt)">
+    
+    <rect class="background" x="0" y="0" width="30" height="20"/>
+    <rect class="static" fill="#888" x="2" y="4" width="6" height="2"/>
+    <rect class="draggable" fill="#007bff" x="2" y="4" width="6" height="2" transform="rotate(90, 5, 5) translate(10, 0)"/>
+    <ellipse class="draggable" fill="#ff00af" cx="5" cy="5" rx="3" ry="2" transform="translate(10, 0)"/>
+    <polygon class="draggable" fill="#ffa500" transform="rotate(15, 15, 15)" points="16.9 15.6 17.4 18.2 15 17 12.6 18.2 13.1 15.6 11.2 13.8 13.8 13.4 15 11 16.2 13.4 18.8 13.8"/>
+    <path class="draggable" stroke="#2bad7b" stroke-width="0.5" fill="none" d="M1 5C5 1 5 9 9 5" transform="translate(20)"/>
+    <text class="draggable" x="25" y="15" text-anchor="middle" font-size="3px" alignment-baseline="middle">Drag</text>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <h2>Working on mobile</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>On final thing: getting mouse events to work on mobile and touch devices. The first thing we need to do is to add handlers for the touch events:</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:7"><code class="language-javascript">svg.addEventListener(&#39;touchstart&#39;, startDrag);
+svg.addEventListener(&#39;touchmove&#39;, drag);
+svg.addEventListener(&#39;touchend&#39;, endDrag);
+svg.addEventListener(&#39;touchleave&#39;, endDrag);
+svg.addEventListener(&#39;touchcancel&#39;, endDrag);</code></pre>
+            </section>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Then, because there can be multiple touches, we need to use only the position of the first one. So we have to update the <b>getMousePosition</b> function:</p></div>
+            </section>
+        
+    
+        
+            <section class="section-block block-code_block">
+                <pre class="prettyprint linenums:14"><code class="language-javascript">function getMousePosition(evt) {
+  var CTM = svg.getScreenCTM();
+  if (evt.touches) { evt = evt.touches[0]; }
+  return {
+    x: (evt.clientX - CTM.e) / CTM.a,
+    y: (evt.clientY - CTM.f) / CTM.d
+  };
+}</code></pre>
+            </section>
+        
+    
+        
+            <h2>Working with groups</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>There are still a few elements this code won&#x27;t work with: groups and foreignObjects. The reason is that these elements wrap child elements.</p></div>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>In the case of foreignObjects you can add a style to prevent the child element from responding to mouse events. Otherwise the code will attempt to add transform attributes to them, which won&#x27;t work.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <pre class="prettyprint linenums"><code class="language-CSS">foreignObject * {
+  pointer-events: none;
+}</code></pre>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>With groups, the groups themselves to do not capture mouse events, so we need to get the group element from the child element.</p></div>
+            </section>
+        
+    
+        
+            <pre class="prettyprint linenums"><code class="language-javascript">selectedElement = evt.target.parentNode;</code></pre>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>You can find the full code <a href="https://github.com/petercollingridge/code-for-blog/blob/master/svg-interaction/draggable/draggable_groups.svg">here</a>, which allows for dragging both individual elements and groups (e.g. the star and ellipse).</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 30 20"
+     onload="makeDraggable(evt)">
+    
+    <style>
+      .static {
+        cursor: not-allowed;
+      }
+      .draggable, .draggable-group {
+        cursor: move;
+      }
+    </style>
+    
+    <script type="text/javascript"><![CDATA[
+      function makeDraggable(evt) {
+        var svg = evt.target;
+
+        svg.addEventListener('mousedown', startDrag);
+        svg.addEventListener('mousemove', drag);
+        svg.addEventListener('mouseup', endDrag);
+        svg.addEventListener('mouseleave', endDrag);
+        svg.addEventListener('touchstart', startDrag);
+        svg.addEventListener('touchmove', drag);
+        svg.addEventListener('touchend', endDrag);
+        svg.addEventListener('touchleave', endDrag);
+        svg.addEventListener('touchcancel', endDrag);
+
+        function getMousePosition(evt) {
+          var CTM = svg.getScreenCTM();
+          if (evt.touches) { evt = evt.touches[0]; }
+          return {
+            x: (evt.clientX - CTM.e) / CTM.a,
+            y: (evt.clientY - CTM.f) / CTM.d
+          };
+        }
+
+        var selectedElement, offset, transform;
+
+        function initialiseDragging(evt) {
+            offset = getMousePosition(evt);
+
+            // Make sure the first transform on the element is a translate transform
+            var transforms = selectedElement.transform.baseVal;
+
+            if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+              // Create an transform that translates by (0, 0)
+              var translate = svg.createSVGTransform();
+              translate.setTranslate(0, 0);
+              selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+            }
+
+            // Get initial translation
+            transform = transforms.getItem(0);
+            offset.x -= transform.matrix.e;
+            offset.y -= transform.matrix.f;
+        }
+
+        function startDrag(evt) {
+          if (evt.target.classList.contains('draggable')) {
+            selectedElement = evt.target;
+            initialiseDragging(evt);
+          } else if (evt.target.parentNode.classList.contains('draggable-group')) {
+            selectedElement = evt.target.parentNode;
+            initialiseDragging(evt);
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+            var coord = getMousePosition(evt);
+            transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = false;
+        }
+      }
+    ]]> </script>
+    
+    <rect x="0" y="0" width="30" height="20" fill="#eee"/>
+    <rect class="static" fill="#888" x="2" y="4" width="6" height="2"/>
+    <rect class="draggable" fill="#007bff" x="2" y="4" width="6" height="2" transform="rotate(90, 5, 5) translate(10, 0)"/>
+    <g class="draggable-group">
+      <ellipse fill="#ff00af" cx="5" cy="5" rx="3" ry="2" transform="translate(10, 0)"/>
+      <polygon fill="#ffa500" transform="rotate(15, 15, 15)" points="16.9 15.6 17.4 18.2 15 17 12.6 18.2 13.1 15.6 11.2 13.8 13.8 13.4 15 11 16.2 13.4 18.8 13.8"/>
+    </g>
+    <g class="draggable-group">
+      <path stroke="#2bad7b" stroke-width="0.5" fill="none" d="M1 5C5 1 5 9 9 5" transform="translate(20)"/>
+      <text x="25" y="15" text-anchor="middle" font-size="3px" alignment-baseline="middle">Drag</text>
+    </g>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <h2>Constraining movement</h2>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Several people have asked how to restrict the movement of items when dragging. At the very least it would make sense to prevent items from being dragged off screen.</p></div>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>The first thing we need to do is to define the boundary we&#x27;re going to restrict items&#x27; movement to. Here I&#x27;m using four variables to define a rectangular boundary. If you want to use a more complex shape then you&#x27;ll have to look into more complex collision detection.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <pre class="prettyprint linenums:31"><code class="language-javascript">var boundaryX1 = 10.5;
+var boundaryX2 = 30;
+var boundaryY1 = 2.2;
+var boundaryY2 = 19.2;</code></pre>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>In the <b>startDrag</b> function, we test whether the selected element has the class &quot;confine&quot;. This is only required if you want some items to be unconstrained.</p></div>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-5 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Then we use the built-in <b>getBBox</b> method to find the bounding box of the element. This returns an object with attributes, <b>x</b>, <b>y</b>, <b>width</b> and <b>height</b> for a box that surrounds the item. We can use this to find the bounding coordinates for the element relative to the boundary.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-7 two-col-block right-block">
+        
+
+
+    
+        
+            <pre class="prettyprint linenums:65"><code class="language-javascript">confined = selectedElement.classList.contains(&#39;confine&#39;);
+if (confined) {
+  bbox = selectedElement.getBBox();
+  minX = boundaryX1 - bbox.x;
+  maxX = boundaryX2 - bbox.x - bbox.width;
+  minY = boundaryY1 - bbox.y;
+  maxY = boundaryY2 - bbox.y - bbox.height;
+}</code></pre>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Note that <b>getBBox</b> doesn&#x27;t take into account transformations on the element, so it&#x27;s best to not have elements with existing transformations. You can either <a href="https://petercollingridge.appspot.com/svg-transforms">apply the transformations</a> to the element directly or wrap everything in a group.</p></div>
+            </section>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-5 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Then, in the <b>drag</b> method, we calculate the position the element is dragged to, and ensure it doesn&#x27;t exceed the boundary before applying it</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-7 two-col-block right-block">
+        
+
+
+    
+        
+            <pre class="prettyprint linenums:81"><code class="language-javascript">var dx = coord.x - offset.x;
+var dy = coord.y - offset.y;
+
+if (confined) {
+  if (dx &lt; minX) { dx = minX; }
+  else if (dx &gt; maxX) { dx = maxX; }
+  if (dy &lt; minY) { dy = minY; }
+  else if (dy &gt; maxY) { dy = maxY; }
+}
+
+transform.setTranslate(dx, dy);</code></pre>
+        
+    
+
+    </div>
+</div>
+        
+    
+        
+            <div class="row">
+    <div class="col-md-7 two-col-block left-block">
+        
+
+
+    
+        
+            <section class="section-block block-paragraph">
+                <div class="rich-text"><p>Here&#x27;s an example of the code in action. The dark grey box represents the restricted area. The ellipse star and word all have the &quot;confine&quot; class name so they cannot leave the box. The rectangle and squiggle don&#x27;t have the class name, so can move freely.</p><p>The complete code can be found <a href="https://raw.githubusercontent.com/petercollingridge/code-for-blog/master/svg-interaction/draggable/draggable_restricted.svg">here</a>.</p></div>
+            </section>
+        
+    
+
+    </div>
+    <div class="col-md-5 two-col-block right-block">
+        
+
+
+    
+        
+            <section class="section-block block-html">
+                <svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 30 20"
+     onload="makeDraggable(evt)">
+    
+    <style>
+      .static {
+        cursor: not-allowed;
+      }
+      .draggable {
+        cursor: move;
+      }
+    </style>
+    
+    <script type="text/javascript"><![CDATA[
+      function makeDraggable(evt) {
+        var svg = evt.target;
+
+        svg.addEventListener('mousedown', startDrag);
+        svg.addEventListener('mousemove', drag);
+        svg.addEventListener('mouseup', endDrag);
+        svg.addEventListener('mouseleave', endDrag);
+        svg.addEventListener('touchstart', startDrag);
+        svg.addEventListener('touchmove', drag);
+        svg.addEventListener('touchend', endDrag);
+        svg.addEventListener('touchleave', endDrag);
+        svg.addEventListener('touchcancel', endDrag);
+
+        var selectedElement, offset, transform,
+            bbox, minX, maxX, minY, maxY, confined;
+
+        var boundaryX1 = 10.5;
+        var boundaryX2 = 30;
+        var boundaryY1 = 2.2;
+        var boundaryY2 = 19.2;
+
+        function getMousePosition(evt) {
+          var CTM = svg.getScreenCTM();
+          if (evt.touches) { evt = evt.touches[0]; }
+          return {
+            x: (evt.clientX - CTM.e) / CTM.a,
+            y: (evt.clientY - CTM.f) / CTM.d
+          };
+        }
+
+        function startDrag(evt) {
+          if (evt.target.classList.contains('draggable')) {
+            selectedElement = evt.target;
+            offset = getMousePosition(evt);
+
+            // Make sure the first transform on the element is a translate transform
+            var transforms = selectedElement.transform.baseVal;
+
+            if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+              // Create an transform that translates by (0, 0)
+              var translate = svg.createSVGTransform();
+              translate.setTranslate(0, 0);
+              selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+            }
+
+            // Get initial translation
+            transform = transforms.getItem(0);
+            offset.x -= transform.matrix.e;
+            offset.y -= transform.matrix.f;
+
+            confined = evt.target.classList.contains('confine');
+            if (confined) {
+                bbox = selectedElement.getBBox();
+                minX = boundaryX1 - bbox.x;
+                maxX = boundaryX2 - bbox.x - bbox.width;
+                minY = boundaryY1 - bbox.y;
+                maxY = boundaryY2 - bbox.y - bbox.height;
+            }
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+
+            var coord = getMousePosition(evt);
+            var dx = coord.x - offset.x;
+            var dy = coord.y - offset.y;
+
+            if (confined) {
+                if (dx < minX) { dx = minX; }
+                else if (dx > maxX) { dx = maxX; }
+                if (dy < minY) { dy = minY; }
+                else if (dy > maxY) { dy = maxY; }
+            }
+
+            transform.setTranslate(dx, dy);
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = false;
+        }
+      }
+    ]]> </script>
+    
+    <rect x="0" y="0" width="30" height="20" fill="#eee"/>
+    <rect x="10.5" y="2.2" width="19.5" height="17" fill="#bbb"/>
+
+    <rect class="static" fill="#888" x="2" y="4" width="6" height="2"/>
+    <rect class="draggable" fill="#007bff" x="4" y="11" width="2" height="6"/>
+    <ellipse class="draggable confine" fill="#ff00af" cx="5" cy="5" rx="3" ry="2" transform="translate(10, 0)"/>
+    <polygon class="draggable confine" fill="#ffa500" points="16.9 15.6 17.4 18.2 15 17 12.6 18.2 13.1 15.6 11.2 13.8 13.8 13.4 15 11 16.2 13.4 18.8 13.8"/>
+    <path class="draggable" stroke="#2bad7b" stroke-width="0.5" fill="none" d="M1 5C5 1 5 9 9 5" transform="translate(20)"/>
+    <text class="draggable confine" x="25" y="15" text-anchor="middle" font-size="3px" alignment-baseline="middle">Drag</text>
+</svg>
+            </section>
+        
+    
+
+    </div>
+</div>
+        
+    
+
+    </article>
+
+    
+    </body>
+</html>
