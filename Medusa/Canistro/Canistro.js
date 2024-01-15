@@ -11,34 +11,6 @@ export class Canistro extends HTMLElement {
 	static options = { 	create: { idleOptions: { disableIdle: true /* Set to true if you do not want idle functionality */ , }, },
 						login : { identityProvider: process.env.DFX_NETWORK === "ic" ? "https://identity.ic0.app/#authorize" : `http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943/`, maxTimeToLive: days * hours * nanoseconds /* Maximum authorization expiration is 8 days */ , } , };
 
-	async client(){
-		this.auth_client = this.auth_client || await AuthClient.create(Canistro.options.create)
-		return this.auth_client
-	}
-	async login(onSuccess, onError){
-		let that = this;
-		authClient.login({ ...Canistro.options.login,
-			onSuccess: async () => { that.fire('login', 0, 	 that); },
-			onError  : async () => { that.fire('login', 255, that); }, 
-		})
-	}						
-
-	async load_canisters(dec_path="Canistro/Declarations"){
-		for (const key in process.env){ 
-			if(key.startsWith("CANISTER_ID_")){
-				const ckey = key.replace("CANISTER_ID_",'').toLowerCase()
-				this.canisters[ckey] = process.env[key] } }
-		for (const cname in this.canisters){ 
-			const candid = await import(`/${dec_path}/${cname}/${cname}.did`)
-			const { canisterId, createActor} = candid
-			const identity = (await this.client.getIdentity())
-			this.canisters[cname] = createActor(canisterId, { agentOptions: { identity, }, }); } }
-			
-	async call(canister_id, method){
-		let actor = canister_id in this.canisters ? this.canister_id[canister_id] : new Panel(this);
-		return await actor[method](); 
-	}
-
 	static get observedAttributes() {
 		return ['progress','status','radius'];
 	}
@@ -105,6 +77,10 @@ export class Canistro extends HTMLElement {
 	
 	}
 
+	resize(svg_width, svg_height) {
+		SVG.configure(this.svg_root, {width:svg_width, height:svg_height, viewBox:`-${svg_width/2} -${svg_height/2} ${svg_width} ${svg_height}`, preserveAspectRatio:"xMidYMid meet"}, true)
+		
+	}
 	redraw(percent) {
 		const radius = this.getAttribute('radius');
 		const progress = this.getAttribute('progress');
@@ -122,9 +98,13 @@ export class Canistro extends HTMLElement {
 		// let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
 		SVG.style(this.progress_ring , this.ring_style(radius, this.circumference )); 
 		let that = this
-		this.progress_ring.addEventListener("mousedown", (e)=>{ console.log(e) })
+		this.progress_ring.addEventListener("mousedown", (e)=>{ 
+			that.load_canisters()
+			that.login()
+		 })
 		this.progress_ring.addEventListener("mouseenter", (e)=>{ that.progress_ring.style.fill = "white" })
 		this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })
+		this.svg_root = svg_root
 		
 	}
 
@@ -152,14 +132,87 @@ export class Canistro extends HTMLElement {
 	constructor() {
 		super();
         eventify(this)
-		this.canisters = {}
 		this.shadow_root = this.attachShadow({mode: 'open'});
 		this.status = '';
 		this.progress = 0;
 		this.setup_pulse();
+		this.canisters = {} 
+		this.actors = {} 
+		this.load_canisters()
 	}
-	
+
+	async client(){
+		this.auth_client = this.auth_client || await AuthClient.create(Canistro.options.create)
+		return this.auth_client
+	}
+	async load_canisters(){
+		for (const key in process.env){ 
+			if(key.startsWith("CANISTER_ID_")){
+				const cid = process.env[key]
+				if (cid !== process.env.CANISTER_ID){
+					const ckey = key.replace("CANISTER_ID_",'').toLowerCase()
+					this.canisters[ckey] = cid  } } } }
+
+	async actor(caller_ident, canister_name){
+		if (canister_name in this.actors){ 
+			let [actor_ident, actor] = this.actors[canister_name]
+			if (!caller_ident || actor_ident.toString() === caller_ident.toString()){ return actor }}
+		const { canisterId, createActor} = await import(`/${"Canistro/Declarations"}/${canister_name}`/* @vite-ignore */)
+		const client = await this.client()
+		const identity = await client.getIdentity()
+		const authenticated = await client.isAuthenticated()
+		const actor = createActor(canisterId, { agentOptions: { identity, }, })
+		this.actors[canister_name] = [identity, actor];
+		return actor
+	} 
+
+	async login(){
+		let that = this;
+		const client = await this.client()
+		client.login({ ...Canistro.options.login,
+			onSuccess: async () => { 
+				console.log("Login Successful")
+				handleAuthenticated(client);
+				// that.fire('login', 0, 	 that);
+				client.idleManager?.registerCallback(() => { // Invalidate identity then render login when user goes idle
+					for (const actor_name in that.actors){ 
+						const actor =  that.actors[actor_name]
+						console.log(`invalidating canister ${actor_name}!`)
+						Actor.agentOf(actor)?.invalidateIdentity?.(); }}); },
+			onError  : async () => { 
+				console.log("Login Error")
+				that.fire('login', 255, that); }, 
+		})
+	}						
+
+	async logout(){
+		const client = await this.client()
+		await client.logout();
+	}
+	async is_authenitcated(){
+		const client = await this.client()
+		return await client.isAuthenticated()
+	}
+
+	async identity(){
+		const client = await this.client()
+		return await client.getIdentity()
+	}
+			
+	async call(canister_name, method){
+		const actor = await this.actor(null ,canister_name)
+		return await actor[method]();
+		// index.js:155 AgentHTTPResponseError: Server returned an error:
+		// Code: 400 (Bad Request)
+		// Body: Specified sender delegation has expired:
+	}
+
+	async invalidate(caller_ident, canister_name){
+		const canister_actor = await this.actor(caller_ident, canister_name)
+		Actor.agentOf(canister_actor)?.invalidateIdentity?.();
+	}
 }
+
 const renderLoggedIn = ( actor, authClient ) => {
 	(document.getElementById("whoamiButton")).onclick =
 		async () => {

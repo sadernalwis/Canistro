@@ -145,7 +145,8 @@ export let Medusa = {
         Medusa.render();
         Medusa.programs.forEach((program,key) => { program.update(); });
         Medusa.youtube_loaded && Medusa.backdrop.viewterminal.playlist.play() 
-        if (Object.keys(terminal.panels).length==0){terminal.show_panel("Identity")}
+        if (Object.keys(terminal.canistros).length==0){
+            terminal.show_canistro("Identity")}
     },
         
     mousemove:(x,y)=>{

@@ -11,7 +11,9 @@ import { Panel } from "./Planet";
 import { Tree } from "Medusa/Mirror/Tree/Tree.js";
 import { Branch } from "Medusa/Mirror/Tree/Branch/Branch.js";
 import { Grid } from "Medusa/Mirror/Terminal/Grid/Grid.js";
-import { Canistro } from "Medusa/Canistro/Canistro.js";
+import { Canistro as CANISTRO } from "Medusa/Canistro/Canistro.js";
+import { Canistro } from "Medusa/Mirror/Terminal/Canistro/Canistro.js";
+
 
 export class Terminal extends HTMLElement {
 
@@ -240,6 +242,15 @@ export class Terminal extends HTMLElement {
 			nodeSettings.setUI(nodeUI);
 		}
 	}
+
+	canistros = {}
+	show_canistro(name, e, node){
+		this.canistro = name in this.canistros ? this.canistros[name] : new Canistro(this);
+		this.terminal_container.appendChild(this.canistro.node);
+		this.canistros[name] = this.canistro
+		// this.canistro.show(e, node)
+	}
+
 	panels = {}
 	show_panel(name, e, node){
 		this.panel = name in this.panels ? this.panels[name] : new Panel(this);
