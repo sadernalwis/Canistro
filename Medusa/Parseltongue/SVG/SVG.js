@@ -4,11 +4,13 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
     board_types : {column:'',row:'row',grid:'l-grid'},
 
     configure: function(element, attributes, skip_dash) {
+        const xlinkNS = 'http://www.w3.org/1999/xlink'
         for (var attr_name in attributes){ // https://www.py4u.net/discuss/975238
+            const xlink = (attr_name.startsWith('xlink:') || attr_name.startsWith('xmlns:')) ? xlinkNS : null
             if(skip_dash){
-                element.setAttributeNS(null, attr_name , attributes[attr_name]);
+                element.setAttributeNS(xlink, attr_name , attributes[attr_name]);
             }else{
-                element.setAttributeNS(null, attr_name.replace(/[A-Z]/g, function(m, attr_name, o, s) { return "-" + m.toLowerCase(); }), attributes[attr_name]);
+                element.setAttributeNS(xlink, attr_name.replace(/[A-Z]/g, function(m, attr_name, o, s) { return "-" + m.toLowerCase(); }), attributes[attr_name]);
             }
             
         }
@@ -209,6 +211,29 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
 		TrueCoords.y = (evt.clientY - translation.y) / newScale;
 	},
 
+    polar_to_cartesian(centerX, centerY, radius, angleInDegrees) {
+        var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+        return {
+            x: centerX + (radius * Math.cos(angleInRadians)),
+            y: centerY + (radius * Math.sin(angleInRadians)) }; },
+
+    describe_arc(x, y, radius, startAngle, endAngle){ // https://stackoverflow.com/a/62080606/10591628
+        var start = SVG.polar_to_cartesian(x, y, radius, endAngle);
+        var end = SVG.polar_to_cartesian(x, y, radius, startAngle);
+        var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+        var d = `M${start.x},${start.y}A${radius}, ${radius}, 0, ${largeArcFlag}, 0, ${end.x}, ${end.y}`;
+        return d;       
+        /* var radi = 20;
+        var st = {'x':80,'y':80};
+        var pie1Arc =  describe_arc( st.x, st.y, radi,0,42) 
+        var pie1 = draw.path(pie1Arc)
+        pie1.fill('none')
+        pie1.stroke({ color: '#f06', width: 3, linecap: 'round', linejoin: 'round' })
+        var pie2Arc =  describe_arc( st.x, st.y, radi,42,360) 
+        var pie2 = draw.path(pie2Arc)
+        pie2.fill('none')
+        pie2.stroke({ color: '#f06', width: 3, linecap: 'round', linejoin: 'round' }) */ },
+      
     visible:function (element,visibility) {
         element.style.display = visibility ? "block" : "none";
     },

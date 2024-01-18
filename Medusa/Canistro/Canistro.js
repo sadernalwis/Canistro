@@ -93,6 +93,7 @@ export class Canistro extends HTMLElement {
 	
 		let svg_root = SVG.put(this.shadow_root, SVG.make("svg", "svg_root", [], {}), 0, true);
 		SVG.configure(svg_root, {width:svg_width, height:svg_height, viewBox:`-${svg_width/2} -${svg_height/2} ${svg_width} ${svg_height}`, preserveAspectRatio:"xMidYMid meet"}, true)
+		HTML.configure( svg_root, {'xmlns':'http://www.w3.org/2000/svg', 'xmlns:xlink':'http://www.w3.org/1999/xlink'}); // SVG.configure(svg_root, {"xmlns:xlink":"http://www.w3.org/1999/xlink", version:"1.1" }, true)		
 		this.progress_ring = SVG.put(svg_root, SVG.make("circle", "progress-ring", [], this.ring_attributes(normalizedRadius, radius,this.circumference, stroke) ), 0, true);
 		this.progress_text = SVG.put(svg_root, SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', progress ), 1, true);
 		// let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
