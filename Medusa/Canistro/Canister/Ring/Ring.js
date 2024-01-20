@@ -13,7 +13,7 @@ export class Ring {
 			strokeDasharray: `${circumference} ${circumference}`,
 			strokeWidth: stroke,
 			fill: "transparent", stroke: '#e74c3c', }
-		SVG.configure(circle, attributes, true)
+		SVG.configure(this.progress_ring, attributes, true)
 		return this
 	}
 
@@ -56,16 +56,16 @@ export class Ring {
 		this.path 		= SVG.make('path','',[],{d: SVG.describe_arc( 0, 0, 50, 90, 270)}, tetxpath_href)
 		SVG.configure(this.path, {pathLength:"100" }, true)
 		this.def 		= SVG.make('defs','',[this.path],{})
-		this.textpath 	= SVG.make('textPath','',[],{"xlink:href":`#${tetxpath_href}`, "dominant-baseline":"hanging", "text-anchor":"middle"}, '', `CANISTRO`)
+		this.textpath 	= SVG.make('textPath','',[],{"xlink:href":`#${tetxpath_href}`, "dominant-baseline":"hanging", "text-anchor":"middle"}, '', this.label)
 		SVG.configure(this.textpath, {startOffset:"50" }, true)
 		this.text 		= SVG.make('text','',[this.textpath],{fill:"#D54E02", "font-size":"16", "font-family":"Helvetica Neue", "font-weight":"600"}, '')
 		this.circle 	= SVG.make("circle", "progress-ring", [], {} )
-		this.title 		= SVG.make("text",   "", [], { "pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.name)
+		// this.title 		= SVG.make("text",   "", [], { "pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.name)
 		this.progress_ring = SVG.make("circle", "progressring", [], {})
-		this.progress_text = SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.label )
+		this.progress_text = SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', 'CANISTRO' )
 		// let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
 		SVG.style(this.progress_ring , this.style(60)); 
-		
+		this.display()
 		let that = this
 		this.progress_ring.addEventListener("mousedown", (e)=>{ 
 			that.canistro.load_canisters()
@@ -73,7 +73,7 @@ export class Ring {
 		})
 		this.progress_ring.addEventListener("mouseenter", (e)=>{ that.progress_ring.style.fill = "white" })
 		this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })		
-		this.group 		= SVG.make('g','',[this.text, this.circle, this.title, this.progress_ring, this.progress_text],{})
+		this.group 		= SVG.make('g','',[this.text, this.circle,/*  this.title, */ this.progress_ring, this.progress_text],{})
 		// const ss = CSS.sheet(this.canistro.terminal.shadow_root, ".progressring", "fill:lightgrey")
 		// console.log(ss, ss.cssRules.length)
 		
