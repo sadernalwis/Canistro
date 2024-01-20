@@ -29,7 +29,13 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
         if(offset!=null){ 
             element.setAttribute("stroke-dashoffset", offset+""); }
     },
-
+    ring_geometry:function(radius, stroke_width=0.2){
+		const stroke = radius * stroke_width;
+		const fit_rad = radius - stroke * 2;
+		const circumference = fit_rad * 2 * Math.PI;
+		return [stroke, fit_rad, circumference]
+	},
+    
     make: function(type,classname,children,attributes,id,inner) {
         const svg = document.createElementNS("http://www.w3.org/2000/svg", type);
         svg.setAttribute('class', classname ? classname : '');

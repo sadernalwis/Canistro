@@ -39,11 +39,13 @@ export class Canistro {
 		if (this.html.grid){HTML.clear(this.html.grid, true)}
 		[,this.html.grid] =  HTML.chain(wrapper, 'div:grid,medusa-darkmode-transparent::');
 		HTML.style(this.html.grid, { display: 'flex', 'flex-flow': 'wrap row', 'align-content': 'flex-start',gap:'15px', width:'100%', height:'100%', padding: '0', margin: '0' })
-		let [, canistro] =  HTML.chain(this.html.grid, 'medusa-canistro:::');
-		HTML.configure(canistro, {id:'queued' , stroke:"40", stroke:"40", radius:"60", progress:"95", status:'in-progress'});
+		// let [, canistro] =  HTML.chain(this.html.grid, 'medusa-canistro:::');
+		// HTML.configure(canistro, {id:'queued' , stroke:"40", stroke:"40", radius:"60", progress:"95", status:'in-progress'});
+
 		// const ring  = new Ring(this.terminal, "testring")
 		// ring.attach(canistro.svg_root, null, canistro.svg_root)
-		this.canistro = canistro 
+		this.canistro = new CANISTRO(this.terminal)/* canistro  */
+		this.canistro.build(this.html.grid)
 		this.block.on("resized", (this.resizer).bind(this))
 		// resizer()
 	}
@@ -70,6 +72,7 @@ export class Canistro {
 		this.html = {}
 		this.settings = {item:{width:100, height:100,}, grid:{size:10}, }
 		this.block = new Block(terminal)
+		terminal.terminal_container.appendChild(this.block.node)
 		this.terminal = this.block.terminal
 		this.build(this.block.node)
 		this.node = this.block.node

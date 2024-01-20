@@ -4,23 +4,21 @@ import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
 import { CSS } from "Medusa/Parseltongue/CSS/CSS.js";
 
 export class Ring {
-	geometry(radius){
-		const stroke = radius * 0.2;
-		const fit_rad = radius - stroke * 2;
-		const circumference = fit_rad * 2 * Math.PI;
-		return [stroke, fit_rad, circumference]
-	}
-	attributes(radius=100, x=0, y=0){
-		const [stroke, fit_rad, circumference] = this.geometry(radius)
-		return {
+
+	display(radius=100, x=0, y=0){
+		const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
+		const attributes = {
 			r: fit_rad, cx: x, cy: y,
 			style: `stroke-dashoffset:${circumference}`,
 			strokeDasharray: `${circumference} ${circumference}`,
 			strokeWidth: stroke,
-			fill: "transparent", stroke: '#e74c3c', }}
+			fill: "transparent", stroke: '#e74c3c', }
+		SVG.configure(circle, attributes, true)
+		return this
+	}
 
 	style(radius){
-		const [stroke, fit_rad, circumference] = this.geometry(radius)
+		const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
 		return {
 			strokeWidth     : 10,
 			strokeLinecap   : 'round',
@@ -49,11 +47,7 @@ export class Ring {
 		this.wrapper = wrapper
 		defs ? SVG.put(defs, this.path,  0, false) : SVG.put(svg_root, this.def,  0, false) ;
 		SVG.put(wrapper, this.group, 1, false);
-		// SVG.put(wrapper, this.text, 1, false);
-		// SVG.put(wrapper, this.circle, 2, false);
-		// SVG.put(wrapper, this.title, 3, false);
-		// SVG.put(wrapper, this.progress_ring , 4, true);
-		// SVG.put(wrapper, this.progress_text , 5, true);
+		return this
 	}
 
 
@@ -67,8 +61,8 @@ export class Ring {
 		this.text 		= SVG.make('text','',[this.textpath],{fill:"#D54E02", "font-size":"16", "font-family":"Helvetica Neue", "font-weight":"600"}, '')
 		this.circle 	= SVG.make("circle", "progress-ring", [], {} )
 		this.title 		= SVG.make("text",   "", [], { "pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.name)
-		this.progress_ring = SVG.make("circle", "progressring", [], this.attributes(60) )
-		this.progress_text = SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.name )
+		this.progress_ring = SVG.make("circle", "progressring", [], {})
+		this.progress_text = SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.label )
 		// let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
 		SVG.style(this.progress_ring , this.style(60)); 
 		
@@ -80,13 +74,16 @@ export class Ring {
 		this.progress_ring.addEventListener("mouseenter", (e)=>{ that.progress_ring.style.fill = "white" })
 		this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })		
 		this.group 		= SVG.make('g','',[this.text, this.circle, this.title, this.progress_ring, this.progress_text],{})
-		const ss = CSS.sheet(this.canistro.shadow_root, ".progressring", "fill:lightgrey")
-		console.log(ss, ss.cssRules.length)
+		// const ss = CSS.sheet(this.canistro.terminal.shadow_root, ".progressring", "fill:lightgrey")
+		// console.log(ss, ss.cssRules.length)
 		
 	}
-	constructor(canistro, name){
+	constructor(canistro, name, label){
 		this.canistro = canistro
 		this.name  = `ring-${name}`
+		this.label = label
+		this.radius = 100
+		this.stroke = 0.2
 		this.html = {}
         this.node = this.build()
 	}

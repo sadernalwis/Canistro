@@ -332,6 +332,8 @@ export class Terminal extends HTMLElement {
 		style_link.setAttribute('rel', 'stylesheet');
 		style_link.setAttribute('href', address);
 		this.shadow_root.append(style_link); // append stylesheet to Shadow DOM
+		// const ss = CSS.sheet(this.canistro.terminal.shadow_root, ".progressring", "fill:lightgrey")
+		// console.log(ss, ss.cssRules.length)
 	}
 
 	reload() {

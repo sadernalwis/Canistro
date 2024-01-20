@@ -147,7 +147,7 @@ export let Medusa = {
         Medusa.youtube_loaded && Medusa.backdrop.viewterminal.playlist.play() 
         if (Object.keys(terminal.canistros).length==0){
             let canistro  = terminal.show_canistro("Identity")
-            canistro.canistro.redraw()
+            // canistro.canistro.redraw()
 		    canistro.resizer()
 
         }
