@@ -95,8 +95,11 @@ retry() {
 	$command # Run the command, and save the exit code
 	local exit_code=$?
   
-	if [[ $exit_code -ne 0 ]]; then # If the exit code is non-zero (i.e. command failed), and we have not reached the maximum number of retries, run the command again
+	if [[ $exit_code -ne 0 ]]; then
 		log "${RED}" "ERROR:\\t${message} ExitCode:${exit_code}\\n"
+		if [[ $retries -eq 0 ]]; then 
+			exit $exit_code
+		fi
 	else 
 		log "${GREEN}" "SUCCESS:\\t${message} ExitCode:${exit_code}\\n"
 	fi
@@ -109,15 +112,51 @@ retry() {
 }
 
 CWD=$PWD
+
+print_help() { # Help message function
+	echo "Usage: $0 [command] [options]"
+	echo
+	echo "Commands:"
+	echo "  --help       Display this help message"
+	echo "  clean        Remove all files and clone repositories"
+	echo "  pull         Update cloned repositories"
+	echo "  predeploy    Run pre-deployment scripts"
+	echo "  start        Start DFX, optionally with bitcoin support"
+	echo "  deploy       Deploy the application"
+	echo
+	echo "Options for 'start':"
+	echo "  bitcoin      Enable bitcoin support in DFX"
+	echo
+	echo "Example:"
+	echo "  $0 deploy         # Deploy the application"
+	echo "  $0 start bitcoin  # Start DFX with bitcoin support"
+}
+
+# Check if the first argument is --help
+if [ "$1" = "--help" ]; then
+	print_help
+	exit 0
+fi
+
 if [ "$1" = "clean" ]
 then
 	rm -rf ./ICP/B3
-	git clone https://github.com/sadernalwis/b3-wallet.git ./ICP/B3
-	git clone https://github.com/sadernalwis/b3_utils.git ./ICP/B3/backend/lib/b3_utils
+	if [[ ! -z $2 ]]
+    then
+        echo "git clone https://github.com/$2/B3Wallet.git ./ICP/B3"
+		git clone https://github.com/$2/B3Wallet.git ./ICP/B3
+        echo "git clone https://github.com/$2/b3_utils.git ./ICP/B3/backend/lib/b3_utils"
+		git clone https://github.com/$2/b3_utils.git ./ICP/B3/backend/lib/b3_utils
+    else
+        echo "git clone https://github.com/B3Pay/B3Wallet.git ./ICP/B3"
+		git clone https://github.com/B3Pay/B3Wallet.git ./ICP/B3
+        echo "git clone https://github.com/B3Pay/b3_utils.git ./ICP/B3/backend/lib/b3_utils"
+		git clone https://github.com/B3Pay/b3_utils.git ./ICP/B3/backend/lib/b3_utils
+    fi
   exit
 fi
 
-if [ "$1" = "" ]
+if [ "$1" = "pull" ]
 then
 	cd ./ICP/B3
 	echo $PWD
@@ -127,12 +166,6 @@ then
 	echo $PWD
 	git pull
 	cd $CWD
-fi
-
-if [ "$1" = "predeploy" ]
-then
-	cd ./ICP/B3
-	sh scripts/predeploy.sh
 fi
 
 if [ "$1" = "start" ]
@@ -147,17 +180,24 @@ then
 	fi 
 fi
 
+if [ "$1" = "predeploy" ]
+then
+	cd ./ICP/B3
+	sh scripts/predeploy.sh
+fi
+
 if [ "$1" = "deploy" ]
 then
 	log "${On_White}" "BUILDING:\\t B3 \\n"
 	retry 1 0 "cd ./ICP/B3" 								"Moving to B3"
 	retry 1 0 "dfx deps pull" 								"Pulling B3 Dependencies"
 	retry 1 0 "dfx deps init" 								"Initializing B3 Dependencies"
-	retry 1 0 "dfx deps deploy internet-identity" 			"Deploying Internet-Identity Canister"
+	retry 1 0 "dfx deps deploy internet_identity" 			"Deploying Internet-Identity Canister"
 	retry 1 0 "bash scripts/install.sh" 					"Installing ckbtc, kyt, minter, and index"
 	retry 1 0 "yarn install" 								"Installing NodeJS dependencies"
 	retry 1 1 "dfx deploy" 									"Deploying B3 on Network"
 	retry 1 0 "dfx generate" 								"Generating Candid for B3"
+	retry 1 0 "source .env" 								"Loading DFX Environment"
 	retry 1 0 "npx ts-node scripts/load-wasm.system.ts" 	"Uploading B3 System WASM"
 	cd $CWD
 fi

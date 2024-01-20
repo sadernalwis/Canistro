@@ -1,5 +1,5 @@
 import { HTML } from "Medusa/Parseltongue/HTML/HTML.js";
-import { CSS } from "Medusa/Parseltongue/HTML/CSS.js";
+import { CSS } from "Medusa/Parseltongue/CSS/CSS.js";
 
 export class AddrressBar {
 

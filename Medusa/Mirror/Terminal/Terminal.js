@@ -248,6 +248,7 @@ export class Terminal extends HTMLElement {
 		this.canistro = name in this.canistros ? this.canistros[name] : new Canistro(this);
 		this.terminal_container.appendChild(this.canistro.node);
 		this.canistros[name] = this.canistro
+		return this.canistro
 		// this.canistro.show(e, node)
 	}
 

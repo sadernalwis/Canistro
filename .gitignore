@@ -14,5 +14,8 @@
 node_modules/
 dist/
 .env
+yarn.lock
+package-lock.json
 
 src/declarations
+Medusa/Canistro/Declarations

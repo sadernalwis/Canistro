@@ -146,7 +146,11 @@ export let Medusa = {
         Medusa.programs.forEach((program,key) => { program.update(); });
         Medusa.youtube_loaded && Medusa.backdrop.viewterminal.playlist.play() 
         if (Object.keys(terminal.canistros).length==0){
-            terminal.show_canistro("Identity")}
+            let canistro  = terminal.show_canistro("Identity")
+            canistro.canistro.redraw()
+		    canistro.resizer()
+
+        }
     },
         
     mousemove:(x,y)=>{

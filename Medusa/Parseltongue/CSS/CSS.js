@@ -219,88 +219,56 @@ export class CSS{
 		// `Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>` 
 		return {filter:result.filter}
 	}
+
+	static sheet(root, selector, style) {
+		// ////////////////////////////////////////////////////
+		// Function is used as follows.					  //
+		// createCSSSelector('.mycssclass', 'display:none'); //
+		// Some other option
+		// https://github.com/kajic/jquery-injectCSS
+		// http://developer.yahoo.com/yui/stylesheet/
+		// https://gist.github.com/shadybones/9816763
+		//////////////////////////////////////////////////////
+		if(!root.styleSheets) { return; }
+		// if(root.getElementsByTagName("head").length == 0) { return; }
+		var styleSheet;
+		var mediaType;
+		if(root.styleSheets.length > 0) {
+			for( let i = 0; i < root.styleSheets.length; i++) {
+				if(root.styleSheets[i].disabled) { continue; }
+				var media = root.styleSheets[i].media;
+				mediaType = typeof media;
+				if(mediaType == "string") {
+					if(media == "" || (media.indexOf("screen") != -1)) { styleSheet = root.styleSheets[i]; } } 
+				else if(mediaType == "object") {
+					if(media.mediaText == "" || (media.mediaText.indexOf("screen") != -1)) { styleSheet = root.styleSheets[i]; } }
+				if( typeof styleSheet != "undefined") { break; } } }
+		if( typeof styleSheet == "undefined") {
+			var styleSheetElement = document.createElement("style");
+			styleSheetElement.type = "text/css";
+			const head = root.getElementsByTagName?.("head")[0]
+			if (head) { head.appendChild(styleSheetElement); }
+			else  	  { root.appendChild(styleSheetElement); }
+			for( let i = 0; i < root.styleSheets.length; i++) {
+				if(root.styleSheets[i].disabled) { continue; }
+				styleSheet = root.styleSheets[i]; }
+			var media = styleSheet.media;
+			mediaType = typeof media; }
+		if(mediaType == "string") {
+			for( let i = 0; i < styleSheet.rules.length; i++) {
+				if(styleSheet.rules[i].selectorText && styleSheet.rules[i].selectorText.toLowerCase() == selector.toLowerCase()) {
+					styleSheet.rules[i].style.cssText = style;
+					return; } }
+			styleSheet.addRule(selector, style); } 
+		else if(mediaType == "object") {
+			for( let i = 0; i < styleSheet.cssRules.length; i++) {
+				if(styleSheet.cssRules[i].selectorText && styleSheet.cssRules[i].selectorText.toLowerCase() == selector.toLowerCase()) {
+					styleSheet.cssRules[i].style.cssText = style;
+					return; } }
+			styleSheet.insertRule(selector + "{" + style + "}", styleSheet.cssRules.length); } 
+		return styleSheet
+		}
+
 }
 
 
-// ////////////////////////////////////////////////////
-// Function is used as follows.					  //
-// createCSSSelector('.mycssclass', 'display:none'); //
-//////////////////////////////////////////////////////
-
-function createCSSSelector(selector, style) {
-	if(!document.styleSheets) {
-		return;
-	}
-
-	if(document.getElementsByTagName("head").length == 0) {
-		return;
-	}
-
-	var stylesheet;
-	var mediaType;
-	if(document.styleSheets.length > 0) {
-		for( i = 0; i < document.styleSheets.length; i++) {
-			if(document.styleSheets[i].disabled) {
-				continue;
-			}
-			var media = document.styleSheets[i].media;
-			mediaType = typeof media;
-
-			if(mediaType == "string") {
-				if(media == "" || (media.indexOf("screen") != -1)) {
-					styleSheet = document.styleSheets[i];
-				}
-			} else if(mediaType == "object") {
-				if(media.mediaText == "" || (media.mediaText.indexOf("screen") != -1)) {
-					styleSheet = document.styleSheets[i];
-				}
-			}
-
-			if( typeof styleSheet != "undefined") {
-				break;
-			}
-		}
-	}
-
-	if( typeof styleSheet == "undefined") {
-		var styleSheetElement = document.createElement("style");
-		styleSheetElement.type = "text/css";
-
-		document.getElementsByTagName("head")[0].appendChild(styleSheetElement);
-
-		for( i = 0; i < document.styleSheets.length; i++) {
-			if(document.styleSheets[i].disabled) {
-				continue;
-			}
-			styleSheet = document.styleSheets[i];
-		}
-
-		var media = styleSheet.media;
-		mediaType = typeof media;
-	}
-
-	if(mediaType == "string") {
-		for( i = 0; i < styleSheet.rules.length; i++) {
-			if(styleSheet.rules[i].selectorText && styleSheet.rules[i].selectorText.toLowerCase() == selector.toLowerCase()) {
-				styleSheet.rules[i].style.cssText = style;
-				return;
-			}
-		}
-
-		styleSheet.addRule(selector, style);
-	} else if(mediaType == "object") {
-		for( i = 0; i < styleSheet.cssRules.length; i++) {
-			if(styleSheet.cssRules[i].selectorText && styleSheet.cssRules[i].selectorText.toLowerCase() == selector.toLowerCase()) {
-				styleSheet.cssRules[i].style.cssText = style;
-				return;
-			}
-		}
-
-		styleSheet.insertRule(selector + "{" + style + "}", styleSheet.cssRules.length);
-	}
-}
-
-// Some other option
-// https://github.com/kajic/jquery-injectCSS
-// http://developer.yahoo.com/yui/stylesheet/
-// https://gist.github.com/shadybones/9816763

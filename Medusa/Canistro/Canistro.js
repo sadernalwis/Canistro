@@ -2,7 +2,7 @@ import { AuthClient } from "@dfinity/auth-client";
 import { Actor } from "@dfinity/agent";
 import eventify from "Medusa/Event.js";
 import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
-
+import { Ring } from "./Ring/Ring.js";
 
 const days = BigInt(1); // One day in nanoseconds
 const hours = BigInt(24);
@@ -16,24 +16,29 @@ export class Canistro extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		if (name === 'progress') {
-			this.setProgress(newValue);
-			this.redraw();
+		// if (name === 'progress') {
+		// 	this.setProgress(newValue);
+		// 	this.redraw();
 
-		}
-		else{
-			this[name] = newValue;
-			this.redraw();
-		}
+		// }
+		// else{
+		// 	this[name] = newValue;
+		// 	this.redraw();
+		// }
 	}
 
 	setProgress(percent) {
-		const offset = this.circumference - (percent / 100 * this.circumference);
-		const circle = this.shadow_root.querySelector('circle');
-		circle.style.strokeDashoffset = offset; 
-		this.progress_text.textContent = `${percent}%`.padStart(4,' ');
-		// circle.nextElementSibling.textContent = this.status;
-		this.progress = parseInt(percent);
+		try {
+			
+			const offset = this.circumference - (percent / 100 * this.circumference);
+			// const circle = this.shadow_root.querySelector('circle');
+			this.ring.circle.style.strokeDashoffset = offset; 
+			this.ring.progress_text.textContent = `${percent}%`.padStart(4,' ');
+			// circle.nextElementSibling.textContent = this.status;
+			this.progress = parseInt(percent);
+		} catch (error) {
+			
+		}
 	}
 	 
 	ring_attributes(normalized_radius, radius, circumference, stroke){
@@ -94,17 +99,21 @@ export class Canistro extends HTMLElement {
 		let svg_root = SVG.put(this.shadow_root, SVG.make("svg", "svg_root", [], {}), 0, true);
 		SVG.configure(svg_root, {width:svg_width, height:svg_height, viewBox:`-${svg_width/2} -${svg_height/2} ${svg_width} ${svg_height}`, preserveAspectRatio:"xMidYMid meet"}, true)
 		HTML.configure( svg_root, {'xmlns':'http://www.w3.org/2000/svg', 'xmlns:xlink':'http://www.w3.org/1999/xlink'}); // SVG.configure(svg_root, {"xmlns:xlink":"http://www.w3.org/1999/xlink", version:"1.1" }, true)		
-		this.progress_ring = SVG.put(svg_root, SVG.make("circle", "progress-ring", [], this.ring_attributes(normalizedRadius, radius,this.circumference, stroke) ), 0, true);
-		this.progress_text = SVG.put(svg_root, SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', progress ), 1, true);
-		// let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
-		SVG.style(this.progress_ring , this.ring_style(radius, this.circumference )); 
-		let that = this
-		this.progress_ring.addEventListener("mousedown", (e)=>{ 
-			that.load_canisters()
-			that.login()
-		 })
-		this.progress_ring.addEventListener("mouseenter", (e)=>{ that.progress_ring.style.fill = "white" })
-		this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })
+		// this.progress_ring = SVG.put(svg_root, SVG.make("circle", "progress-ring", [], this.ring_attributes(normalizedRadius, radius,this.circumference, stroke) ), 0, true);
+		// this.progress_text = SVG.put(svg_root, SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', progress ), 1, true);
+		// // let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
+		// SVG.style(this.progress_ring , this.ring_style(radius, this.circumference )); 
+
+		this.ring  = new Ring(this, "testring")
+		this.ring.attach(svg_root, null, svg_root)
+
+		// let that = this
+		// this.progress_ring.addEventListener("mousedown", (e)=>{ 
+		// 	that.load_canisters()
+		// 	that.login()
+		//  })
+		// this.progress_ring.addEventListener("mouseenter", (e)=>{ that.progress_ring.style.fill = "white" })
+		// this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })
 		this.svg_root = svg_root
 		
 	}
@@ -137,6 +146,7 @@ export class Canistro extends HTMLElement {
 		this.status = '';
 		this.progress = 0;
 		this.setup_pulse();
+		// this.redraw()
 		this.canisters = {} 
 		this.actors = {} 
 		this.load_canisters()

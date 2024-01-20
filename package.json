@@ -10,10 +10,17 @@
     "Canister"
   ],
   "scripts": {
-    "build:vanilla": "vite build Medusa --config vite.config.js",
-    "build": "npm run build:vanilla",
-    "prebuild": "npm run generate",
-    "start": "vite Medusa --config vite.config.js",
+    "dev": "vite --host 0.0.0.0 --port 443",
+    "clean": "bash ./ICP/ICP.sh clean sadernalwis",
+    "pull": "bash ./ICP/ICP.sh pull",
+    "start": "bash ./ICP/ICP.sh start",
+    "build": "vite build",
+    "prebuild": "python3 ./Setup/Scripts/Python/DFX.py backup",
+    "postbuild": "python3 ./Setup/Scripts/Python/DFX.py restore",
+    "clean:candid": "python3 ./Setup/Scripts/Python/DFX.py clean",
+    "candid": "python3 ./Setup/Scripts/Python/DFX.py candid",
+    "deploy": "yarn clean:candid && dfx deploy && yarn candid && vite Medusa --config vite.config.js",
+    "b3": "cd ./ICP/B3 && yarn autobuild deploy",
     "start:dfx": "dfx start --background --clean --host \"127.0.0.1:4943\"",
     "prestart": "npm run generate",
     "release": "node release.mjs",
@@ -30,6 +37,7 @@
     "util": "0.12.4",
     "vite": "^4.3.6",
     "vite-plugin-environment": "^1.1.3",
+    "vite-plugin-static-copy": "^1.0.0",
     "zx": "^7.2.3"
   },
   "browserslist": [
