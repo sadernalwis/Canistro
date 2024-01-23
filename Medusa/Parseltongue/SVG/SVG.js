@@ -217,7 +217,7 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
 		let y = (event.clientY - translation.y) / newScale;
         return [x,y]
 	},
-    true_coords:function(event) {
+    true_coords:function(event, element) {
         // pt.x = event.clientX;
         // pt.y = event.clientY;
         // var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse()); // The cursor point, translated into svg coordinates
@@ -225,7 +225,7 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
         const toSVGPoint = (svg, x, y) => {
             let p = new DOMPoint(x, y);
             return p.matrixTransform(svg.getScreenCTM().inverse()); };
-        let cursorpt = toSVGPoint(event.target, event.clientX, event.clientY);
+        let cursorpt = toSVGPoint(element || event.target, event.clientX, event.clientY);
         return [cursorpt.x, cursorpt.y]
     },
     polar_to_cartesian(centerX, centerY, radius, angleInDegrees) {

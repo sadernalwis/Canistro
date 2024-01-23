@@ -3,7 +3,8 @@ import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
 import { JS } from "Medusa/Parseltongue/JS/JS.js";
 import {Touch} from './pointer.js'
 export let Pointer = {
-    init: function(element) {
+    init: function(canistro, element) {
+        this.canistro = canistro
         this.element = element
         element.addEventListener("pointerdown", Pointer.pointerdown, false);
         element.addEventListener("pointermove", Pointer.pointermove, false);
@@ -42,7 +43,7 @@ export let Pointer = {
         // Pointer.map.delete(event.pointerId); 
         Pointer.postMessage(event, 4, event.clientX, event.clientY, event.pressure); },
 
-    wheel: function(event) {
+    wheel: function(event) { // https://stackoverflow.com/questions/76150884/how-to-use-the-mouse-wheel-to-zoom-on-an-svg-using-the-viewbox
             event.preventDefault();
             let scale = event.deltaY / 1000; // set the scaling factor (and make sure it's at least 10%)
             scale = Math.abs(scale) < .1 ? .1 * event.deltaY / Math.abs(event.deltaY) : scale;
@@ -84,7 +85,10 @@ export let Pointer = {
     
     pin: function(event) {
         if(event.target.code?.type==="ring"){
-            event.target.code.pinhole(event)
+            let location = event.target.code.pinhole(event)
+            if(location){
+                Pointer.canistro.pointer.display(10, ...location)
+            }
             /* console.log("ring deteced") */ } },
 
     navigate: function(path) {

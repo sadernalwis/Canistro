@@ -7,7 +7,7 @@ export class Ring {
 
 	pinhole(event, pin_count=64, orientation = "north"){
 		const radius = this.radius
-		const [px, py] = SVG.true_coords(event)
+		const [px, py] = SVG.true_coords(event, event.srcTarget)
 		const a = px - this.x;
 		const b = py - this.y;
 		const distance = Math.sqrt( a*a + b*b );
@@ -29,8 +29,12 @@ export class Ring {
 		angle = ((angle % whole) + whole) % whole // convert angle to range between 0 and 360 (although we’re working in radians, of course)
 		const degrees =  360-(angle * 180 / Math.PI) // returns angle in degrees
 		// const threhsold = this.radius-fit_rad
-		if ((radius-20)<distance && distance <this.radius){
-            console.log(`${this.label}ring deteced @ ${JS.snap(degrees, 10)}`)
+		if ((radius-20)<distance && distance <radius){
+			const snap_deg = JS.snap(degrees, 10)
+			let n_x = radius * Math.cos(snap_deg * Math.PI / 180);
+			let n_y = radius * Math.sin(snap_deg * Math.PI / 180);
+            console.log(`${this.label}ring deteced @ ${snap_deg}`)
+			return [n_x, n_y]
 		}
 	}
 
@@ -50,7 +54,7 @@ export class Ring {
 
 	style(){
 		const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
-		return {
+		const styles = {
 			strokeWidth     : 2,
 			strokeLinecap   : 'round',
 			fill            : 'lightgrey',
@@ -58,9 +62,16 @@ export class Ring {
 			// strokeDasharray : circumference,
 			strokeLinecap   : 'round',
 			// transformOrigin : `${radius}px ${radius}px`,
-			transform       : `rotate(180deg)`,
+			// transform       : `rotate(180deg)`,
 			animation       : `dash 2s ease-in-out infinite`,
-			transition		: 'all 250ms  ease  0ms' } }
+			transition		: 'all 250ms  ease  0ms'  } 
+			if(this.type==="ring"){styles['transform']=`rotate(180deg)`}
+			else if(this.type==="pointer"){
+				styles['transform']=`rotate(-90deg)`
+				// delete styles['transition']
+			}
+			return styles
+		}
 
 	configure(radius){
 		SVG.configure(circle, this.attributes(radius), true)
@@ -77,7 +88,7 @@ export class Ring {
 		this.defs = defs || this.def
 		this.wrapper = wrapper
 		defs ? SVG.put(defs, this.path,  0, false) : SVG.put(svg_root, this.def,  0, false) ;
-		SVG.put(wrapper, this.group, 1, false);
+		SVG.put(wrapper, this.group, -1, false);
 		return this
 	}
 
@@ -112,13 +123,12 @@ export class Ring {
 		// console.log(ss, ss.cssRules.length)
 		
 	}
-	get type(){
-		return 'ring'
-	}
-	constructor(canistro, name, label){
+
+	constructor(canistro, name, label, type="ring"){
 		this.canistro = canistro
 		this.name  = `ring-${name}`
 		this.label = label
+		this.type = type
 		this.radius = 100
 		this.stroke = 0.2
 		this.html = {}
