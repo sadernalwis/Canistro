@@ -210,13 +210,24 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
 		}
 	},
 
-	GetTrueCoords:function(evt) {
-		var newScale = SVGRoot.currentScale;
-		var translation = SVGRoot.currentTranslate;
-		TrueCoords.x = (evt.clientX - translation.x) / newScale;
-		TrueCoords.y = (evt.clientY - translation.y) / newScale;
+	true_coords:function(svg_root, event) {
+		var newScale = svg_root.currentScale;
+		var translation = svg_root.currentTranslate;
+		let x = (event.clientX - translation.x) / newScale;
+		let y = (event.clientY - translation.y) / newScale;
+        return [x,y]
 	},
-
+    true_coords:function(event) {
+        // pt.x = event.clientX;
+        // pt.y = event.clientY;
+        // var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse()); // The cursor point, translated into svg coordinates
+        // console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
+        const toSVGPoint = (svg, x, y) => {
+            let p = new DOMPoint(x, y);
+            return p.matrixTransform(svg.getScreenCTM().inverse()); };
+        let cursorpt = toSVGPoint(event.target, event.clientX, event.clientY);
+        return [cursorpt.x, cursorpt.y]
+    },
     polar_to_cartesian(centerX, centerY, radius, angleInDegrees) {
         var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
         return {

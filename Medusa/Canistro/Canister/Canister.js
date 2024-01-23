@@ -7,8 +7,9 @@ import { Ring } from "./Ring/Ring.js";
 
 export class Canister {
 	display(radius=100, x=0, y=0){
-		this.methods.display(radius, x, y)
-		this.parameters.display(radius, x, y)
+		this.lens.display(radius-60, x, y)
+		this.methods.display(radius-40, x, y)
+		this.parameters.display(radius-20, x, y)
 		this.results.display(radius, x, y)
 	}
 
@@ -27,9 +28,11 @@ export class Canister {
 
 	build(){
 		const [svg_root, defs] = [this.canistro.svg_root, this.canistro.defs]
+		this.lens  = new Ring(this.canistro, `${this.name}-lens`, 'lens')
 		this.methods  = new Ring(this.canistro, `${this.name}-methods`, 'methods')
 		this.parameters  = new Ring(this.canistro, `${this.name}-parameters`, 'parameters')
 		this.results  = new Ring(this.canistro, `${this.name}-results`, 'results')
+		this.lens.attach(svg_root, defs, svg_root)
 		this.methods.attach(svg_root, defs, svg_root)
 		this.parameters.attach(svg_root, defs, svg_root)
 		this.results.attach(svg_root, defs, svg_root)

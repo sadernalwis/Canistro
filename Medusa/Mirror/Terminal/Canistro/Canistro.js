@@ -47,6 +47,7 @@ export class Canistro {
 		this.canistro = new CANISTRO(this.terminal)/* canistro  */
 		this.canistro.build(this.html.grid)
 		this.block.on("resized", (this.resizer).bind(this))
+        this.block.display_terminal(false)
 		// resizer()
 	}
 

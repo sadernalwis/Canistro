@@ -4,7 +4,9 @@ import { IDL } from "@dfinity/candid";
 import eventify from "Medusa/Event.js";
 import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
 import { Canister } from "./Canister/Canister.js";
-
+// import {Worker} from './Pointer/pointer.js?worker'
+import {Touch} from './Pointer/pointer.js'
+import { Pointer } from "./Pointer/Pointer.js";
 const days = BigInt(1); // One day in nanoseconds
 const hours = BigInt(24);
 const nanoseconds = BigInt(3600000000000);
@@ -107,9 +109,13 @@ export class Canistro/*  extends HTMLElement  */{
 		// SVG.style(this.progress_ring , this.ring_style(radius, this.circumference )); 
 
 		this.svg_root = svg_root
+		Pointer.init(this.svg_root)
+
 		// this.ring  = new Ring(this, "testring")
 		// this.ring.attach(svg_root, null, svg_root)
 		this.ring  = new Canister(this, "canister")
+		this.ring.display(180)
+		console.log('caniister.display()')
 		// this.ring.attach(svg_root, null, svg_root)
 
 		// let that = this

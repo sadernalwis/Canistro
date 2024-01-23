@@ -2,63 +2,34 @@
 import { HTML } from "Medusa/Parseltongue/HTML/HTML.js";
 import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
 import { CSS } from "Medusa/Parseltongue/CSS/CSS.js";
-import { JS } from "Medusa/Parseltongue/JS/JS.js";
-export class Ring {
 
-	pinhole(event, pin_count=64, orientation = "north"){
-		const radius = this.radius
-		const [px, py] = SVG.true_coords(event)
-		const a = px - this.x;
-		const b = py - this.y;
-		const distance = Math.sqrt( a*a + b*b );
-		var angle = Math.atan2(a, b)// * 180 / Math.PI;
-		const whole = Math.PI * 2
-		switch(orientation) { // Change where zero is located
-			case "west":
-				angle -= whole / 4
-				break
-			case "north":
-				angle += 0
-				break
-			case "east":
-				angle += whole / 4
-				break
-			case "south":            
-				angle += whole / 2
-				break }
-		angle = ((angle % whole) + whole) % whole // convert angle to range between 0 and 360 (although we’re working in radians, of course)
-		const degrees =  360-(angle * 180 / Math.PI) // returns angle in degrees
-		// const threhsold = this.radius-fit_rad
-		if ((radius-20)<distance && distance <this.radius){
-            console.log(`${this.label}ring deteced @ ${JS.snap(degrees, 10)}`)
-		}
-	}
+export class Connector {
 
 	display(radius=100, x=0, y=0){
 		[this.radius, this.x, this.y] = [radius, x, y]
-		// const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
+		const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
 		const attributes = {
-			r: this.radius, cx: this.x, cy: this.y,
-			// style: `stroke-dashoffset:${circumference}`,
-			// strokeDasharray: `${circumference} ${circumference}`,
-			// strokeWidth: stroke,
+			r: fit_rad, cx: this.x, cy: this.y,
+			style: `stroke-dashoffset:${circumference}`,
+			strokeDasharray: `${circumference} ${circumference}`,
+			strokeWidth: stroke,
 			fill: "transparent", stroke: '#e74c3c', }
 		SVG.configure(this.progress_ring, attributes, true)
-		SVG.configure(this.path, {d:SVG.describe_arc( x, y, this.radius, 90, 270)}, true)
+		SVG.configure(this.path, {d:SVG.describe_arc( x, y, fit_rad, 90, 270)}, true)
 		return this
 	}
 
 	style(){
 		const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
 		return {
-			strokeWidth     : 2,
+			strokeWidth     : 10,
 			strokeLinecap   : 'round',
 			fill            : 'lightgrey',
 			strokeDashoffset: 0,
-			// strokeDasharray : circumference,
+			strokeDasharray : circumference,
 			strokeLinecap   : 'round',
 			// transformOrigin : `${radius}px ${radius}px`,
-			transform       : `rotate(180deg)`,
+			transform       : `rotate(-90deg)`,
 			animation       : `dash 2s ease-in-out infinite`,
 			transition		: 'all 250ms  ease  0ms' } }
 
@@ -97,11 +68,8 @@ export class Ring {
 		// let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
 		SVG.style(this.progress_ring , this.style()); 
 		this.display()
-		console.log('ring.display()')
 		let that = this
-		this.progress_ring.code = this
 		this.progress_ring.addEventListener("mousedown", (e)=>{ 
-			e.preventDefault();
 			that.canistro.load_canisters()
 			that.canistro.login()
 		})
@@ -111,9 +79,6 @@ export class Ring {
 		// const ss = CSS.sheet(this.canistro.terminal.shadow_root, ".progressring", "fill:lightgrey")
 		// console.log(ss, ss.cssRules.length)
 		
-	}
-	get type(){
-		return 'ring'
 	}
 	constructor(canistro, name, label){
 		this.canistro = canistro

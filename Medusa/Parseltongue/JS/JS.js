@@ -4,6 +4,8 @@ export let JS = {
         def_val = def_val === undefined ? 0 : def_val
         return parseFloat(value === undefined ? def_val : value)
     },
+    snap: function(value, size=5) { return Math.round(value / size) * size },
+    
     character_regex:function(charset){
         return new RegExp(`(?:[${charset}])`)
     },
