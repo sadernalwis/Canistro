@@ -9,108 +9,115 @@ export let Pointer = {
         element.addEventListener("pointermove", Pointer.pointermove, false);
         element.addEventListener("pointerup", Pointer.pointerup, false);
         element.addEventListener("pointercancel", Pointer.pointercancel, false);
+        element.addEventListener("wheel", Pointer.wheel, false);
         // Pointer.worker = new Worker('text/javascript/ui/workers/pointer.js');
         // Pointer.worker.onmessage = Pointer.onMessage;
-        return Pointer;
-    },
+        return Pointer; },
+
     pointerdown: function(event) {
         event.preventDefault();
         if (event.isPrimary || Pointer.map === undefined) {
             Pointer.map_clear = true;
-            Pointer.map = new Map();
-        }
-        Pointer.map.set(event.pointerId, { s: 'o', x: event.clientX, y: event.clientX, f: event.pressure });
-        Pointer.postMessage(event, 1, event.clientX, event.clientY, event.pressure);
-    },
+            Pointer.map = new Map(); }
+        // Pointer.map.set(event.pointerId, { s: 'o', x: event.clientX, y: event.clientX, f: event.pressure });
+        Pointer.postMessage(event, 1, event.clientX, event.clientY, event.pressure); },
+
     pointermove: function(event) {
         event.preventDefault();
         if (Pointer.map) {
             // console.log("moved", SVG.true_coords(Pointer.element, event))
-            Pointer.map.set(event.pointerId, { s: 'o', x: event.clientX, y: event.clientX, f: event.pressure });
+            // Pointer.map.set(event.pointerId, { s: 'o', x: event.clientX, y: event.clientX, f: event.pressure });
             Pointer.postMessage(event, 2, event.clientX, event.clientY, event.pressure);
         }
-        Pointer.pin(event)
-    },
+        Pointer.pin(event) },
+
     pointerup: function(event) {
         event.preventDefault();
-        Pointer.map.set(event.pointerId, { s: 'o', x: event.clientX, y: event.clientX, f: event.pressure });
-        Pointer.postMessage(event, 3, event.clientX, event.clientY, event.pressure);
-    },
+        // Pointer.map.set(event.pointerId, { s: 'o', x: event.clientX, y: event.clientX, f: event.pressure });
+        // Pointer.map.delete(event.pointerId);
+        Pointer.postMessage(event, 3, event.clientX, event.clientY, event.pressure); },
+
     pointercancel: function(event) {
         event.preventDefault();
-        Pointer.map.set(event.pointerId, { s: 'x', x: event.clientX, y: event.clientX });
+        // Pointer.map.delete(event.pointerId); 
+        Pointer.postMessage(event, 4, event.clientX, event.clientY, event.pressure); },
+
+    wheel: function(event) {
+            event.preventDefault();
+            let scale = event.deltaY / 1000; // set the scaling factor (and make sure it's at least 10%)
+            scale = Math.abs(scale) < .1 ? .1 * event.deltaY / Math.abs(event.deltaY) : scale;
+            let svg = Pointer.element
+            // Pointer.element.currentScale += scale
+            let pt = new DOMPoint(event.clientX, event.clientY); // get point in SVG space
+            pt = pt.matrixTransform(svg.getScreenCTM().inverse());
+            let [x, y, width, height] = svg.getAttribute('viewBox').split(' ').map(Number); // get viewbox transform
+            let [xPropW, yPropH] = [(pt.x - x) / width, (pt.y - y) / height]; // get pt.x as a proportion of width and pt.y as proportion of height
+            let [width2, height2] = [width + width * scale, height + height * scale]; // calc new width and height, new x2, y2 (using proportions and new width and height)
+            let x2 = pt.x - xPropW * width2;
+            let y2 = pt.y - yPropH * height2;        
+            svg.setAttribute('viewBox', `${x2} ${y2} ${width2} ${height2}`);
     },
-    draw: function() {
-        if (Pointer.map_clear) {
-            Pointer.Ui.ctx1.clearRect(0, 0, Ui.c1.width, Ui.c1.height);
-            Pointer.map_clear = false;
-        }
-        Pointer.map.forEach(function(value, key, map) {
-            Pointer.Ui.ctx1.fillStyle = `rgb(${value.f * 10},${0},${0},${1})`;
-            Pointer.Ui.ctx1.font = `${100}px mono`;
-            Pointer.Ui.ctx1.textBaseline = 'middle';
-            Pointer.Ui.ctx1.textAlign = 'center';
-            Pointer.Ui.ctx1.fillText(value.f, value.x * Pointer.Ui.dpi, value.y * Pointer.Ui.dpi);
-        });
-
-    },
-
-    // snap: function(value, size=5) { return Math.round(value / size) * size },
-
+        
     postMessage: function(event, state, x, y, f) {
         let [sx, sy] = SVG.true_coords(event);
         var exyf = { event:event, state:state, vector:[JS.snap(sx), JS.snap(sy), f] };
-        if (state === 1)      { Touch.start(exyf, this); } 
-        else if (state === 2) { Touch.move(exyf, this); } 
-        else if (state === 3) { Touch.end(exyf, this); }
+        const p_id = event.pointerId
+        const p_data = Pointer.map.get(p_id)
+        const cexy = [event.clientX, event.clientY]
+        if (state === 1) { 
+            Pointer.map.set(p_id, [[event.clientX, event.clientY]])
+            Touch.start(exyf, this); } 
+        else if (state === 2) { 
+            if (p_data){ 
+                p_data.push(cexy) 
+                Pointer.navigate(p_data)}
+            Touch.move(exyf, this); 
+        } 
+        else if (state === 3) { 
+            Pointer.map.delete(p_id)
+            Touch.end(exyf, this); }
+        else if (state === 4) { 
+            Pointer.map.delete(p_id)
+            Touch.end(exyf, this); }
         // Pointer.worker.postMessage(exyf);
     },
-    onMessage: function(message) {
+    
+    pin: function(event) {
+        if(event.target.code?.type==="ring"){
+            event.target.code.pinhole(event)
+            /* console.log("ring deteced") */ } },
 
+    navigate: function(path) {
+        const svg = Pointer.element
+        const delta = JS.slice(path, -3, -1)
+        if (delta.length==2){
+            const [[sx, sy], [ex, ey]] = JS.slice(path, -3, -1)
+            let [w,h] = [svg.clientWidth, svg.clientHeight]
+            let [ox, oy, vx, vy] = svg.getAttribute('viewBox').split(' ').map(c => +c)
+            let [dx, dy] = [(sx-ex)*vx/w, (sy-ey)*vy/h] 
+            let [nox, noy] = [ox+dx, oy+dy]
+            svg.setAttribute('viewBox', [nox, noy, vx, vy].join(' ')) } },
+
+    onMessage: function(message) {
         let data = message.data;
         console.log(message);
         if (data.type) {
-            if (data.type == 'debug') {
-                log(data.msg);
-            } else {
-                //var rate = Math.round(toMB(data.byteLength) / elapsed);
-            }
-        } else {
-
-        }
-
-
-
-    },
+            if (data.type == 'debug') { log(data.msg); } 
+            else { var rate = Math.round(toMB(data.byteLength) / elapsed); } } 
+        else { } },
+        
     in: function(node, coords, selection) {
         if (node.children && node.children.length) {
             node.children.forEach(
-                function(child) {
-                    Pointer.in(child, coords, selection);
-                }
-            );
-        } else if (Container.hit_test(node, coords)) {
-            selection.push(node);
-        }
-    },
+                function(child) { Pointer.in(child, coords, selection); } ); } 
+        else if (Container.hit_test(node, coords)) { selection.push(node); } },
+
     hit_test: function(node, coords) {
         coords.forEach(function(coord) {
             var a = node.x - coord.pageX;
             var b = node.y - coord.pageY;
-            if ((a > node.width / 2) && (b > node.height / 2)) {
-                return false;
-            }
+            if ((a > node.width / 2) && (b > node.height / 2)) { return false; }});
+        return true; },
 
-        });
-        return true;
-    },
-
-    pin: function(event) {
-        if(event.target.code?.type==="ring"){
-            event.target.code.pinhole(event)
-            // console.log("ring deteced")
-        }
-        
-    }
 
 };

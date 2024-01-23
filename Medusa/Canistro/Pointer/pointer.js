@@ -48,50 +48,43 @@ export let Touch = {
     },
     process: function(id, event, vectors) {
         let result = Touch.map.get(id);
-        if (!result) {
-            return
-            result = { length: 0, data: [] };
-            vectors.forEach(function() {
-                let scans = [];
-                // Touch.scans.forEach(function() { scans.push({ accumulator: [], average: Math.log2(0), direction: UP, signature: [ [0, 0] ] }); });
-                Touch.scans.forEach(function(scan) { scans[scan] = { accumulator: [], average: Math.log2(0), direction: UP, signature: [ [0, 0] ] }; });
-                result.data.push({ stroke:[], minimum: 0.0, maximum: 0.0, scans: scans }); });
-            Touch.map.set(id, result); }
-        result.length++;
-        result.targets.push(event.target)
-        vectors.forEach(function(vector, index) {
-            let data_block = result.data[index]
-            data_block.stroke.push(vector)
-            data_block.minimum = Math.min(data_block.minimum, vector)
-            data_block.maximum = Math.max(data_block.maximum, vector)
-            Touch.scans.forEach(function(scan, pass) {
-                let index_pass = data_block.scans[scan];
-                index_pass.accumulator.push(vector);
-                if (result.length % scan === 0) {
-                    let average = index_pass.accumulator.reduce(function(accumulator, currentValue) { return accumulator + currentValue; }, 0.0) / index_pass.accumulator.length;
-                    index_pass.accumulator = [];
-                    let difference = average - index_pass.average;
-                    if (difference > 0) {
-                        if (index_pass.direction === UP) {
-                            index_pass.signature[0][0] += difference;
-                            index_pass.signature[0][1]++; } 
-                        else if (index_pass.direction === DOWN) {
-                            index_pass.direction = UP;
-                            index_pass.signature.unshift([difference, 1]); } } 
-                    else if (difference === 0) { index_pass.signature[0][1]++; } 
-                    else if (difference < 0) {
-                        if (index_pass.direction === UP) {
-                            index_pass.direction = DOWN;
-                            index_pass.signature.unshift([difference, 1]); } 
-                        else if (index_pass.direction === DOWN) {
-                            index_pass.signature[0][0] += difference;
-                            index_pass.signature[0][1]++; } }
-                    index_pass.average = average; } 
-                else {
-
-                }
-            })
-
-        });
+        if (result) {
+            result.length++;
+            result.targets.push(event.target)
+            vectors.forEach(function(vector, index) {
+                let data_block = result.data[index]
+                data_block.stroke.push(vector)
+                data_block.minimum = Math.min(data_block.minimum, vector)
+                data_block.maximum = Math.max(data_block.maximum, vector)
+                Touch.scans.forEach(function(scan, pass) {
+                    let index_pass = data_block.scans[scan];
+                    index_pass.accumulator.push(vector);
+                    if (result.length % scan === 0) {
+                        let average = index_pass.accumulator.reduce(function(accumulator, currentValue) { return accumulator + currentValue; }, 0.0) / index_pass.accumulator.length;
+                        index_pass.accumulator = [];
+                        let difference = average - index_pass.average;
+                        if (difference > 0) {
+                            if (index_pass.direction === UP) {
+                                index_pass.signature[0][0] += difference;
+                                index_pass.signature[0][1]++; } 
+                            else if (index_pass.direction === DOWN) {
+                                index_pass.direction = UP;
+                                index_pass.signature.unshift([difference, 1]); } } 
+                        else if (difference === 0) { index_pass.signature[0][1]++; } 
+                        else if (difference < 0) {
+                            if (index_pass.direction === UP) {
+                                index_pass.direction = DOWN;
+                                index_pass.signature.unshift([difference, 1]); } 
+                            else if (index_pass.direction === DOWN) {
+                                index_pass.signature[0][0] += difference;
+                                index_pass.signature[0][1]++; } }
+                        index_pass.average = average; } 
+                    else {
+    
+                    }
+                })
+    
+            });   
+        }
     }
 };
