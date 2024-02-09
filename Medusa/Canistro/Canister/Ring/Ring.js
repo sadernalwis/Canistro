@@ -3,9 +3,33 @@ import { HTML } from "Medusa/Parseltongue/HTML/HTML.js";
 import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
 import { CSS } from "Medusa/Parseltongue/CSS/CSS.js";
 import { JS } from "Medusa/Parseltongue/JS/JS.js";
+import { Boundary } from "Medusa/Parseltongue/Boundary/Boundary.js"
 export class Ring {
 
-	pinhole(event, pin_count=64, orientation = "north"){
+	get pin_range(){
+		return 360/this.pin_count
+	}
+
+	get pin_radius(){
+		const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, 0)
+		return (circumference/this.pin_count/2)-1
+	}
+
+	rad_deg(angle){
+		return this.rad_idx(angle)*this.pin_range
+	}
+
+	rad_idx(angle){
+		return Math.floor(angle/this.pin_range)
+	}
+
+	rad_loc(angle){
+		const radius = this.radius
+		let n_x = radius * Math.cos(angle * Math.PI / 180);
+		let n_y = radius * Math.sin(angle * Math.PI / 180);
+		return [n_x, n_y] }
+
+	pinhole(event, orientation = "north"){
 		const radius = this.radius
 		const [px, py] = SVG.true_coords(event, event.srcTarget)
 		const a = px - this.x;
@@ -30,11 +54,11 @@ export class Ring {
 		const degrees =  360-(angle * 180 / Math.PI) // returns angle in degrees
 		// const threhsold = this.radius-fit_rad
 		if ((radius-20)<distance && distance <radius){
-			const snap_deg = JS.snap(degrees, 10)
+			const snap_deg = this.rad_deg(degrees)//JS.snap(degrees, this.pin_range)
 			let n_x = radius * Math.cos(snap_deg * Math.PI / 180);
 			let n_y = radius * Math.sin(snap_deg * Math.PI / 180);
-            console.log(`${this.label}ring deteced @ ${snap_deg}`)
-			return [n_x, n_y]
+            // console.log(`${this.rad_idx(degrees)} ${this.label}ring deteced @ ${snap_deg}`)
+			return [this.pin_radius, n_x, n_y]
 		}
 	}
 
@@ -126,6 +150,7 @@ export class Ring {
 
 	constructor(canistro, name, label, type="ring"){
 		this.canistro = canistro
+		this.pin_count = 64 
 		this.name  = `ring-${name}`
 		this.label = label
 		this.type = type

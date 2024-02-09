@@ -29,21 +29,23 @@ export let Touch = {
     start: function(touch, pointer) {
         const id =  touch.event.pointerId
         if (touch.event.isPrimary) { Touch.map = new Map(); }
-        let result = { length: 0, data: [], targets: [] };
+        let result = { length: 0, data: [], targets: [], vectors:[] };
         touch.vector.forEach(function() {
             let scans = [];
             Touch.scans.forEach(function(scan) { scans[scan] = { accumulator: [], average: Math.log2(0), direction: UP, signature: [ [0, 0] ] }; });
             result.data.push({ stroke:[], minimum: Infinity, maximum: -Infinity, scans: scans }); });
         Touch.map.set(id, result); 
-        Touch.process(id, touch.event, touch.vector); },
+        Touch.process(id, touch.event, touch.vector); 
+        pointer.process([1, id, Touch.map.get(id)]); },
     move: function(touch, pointer) {
         const id =  touch.event.pointerId
         Touch.process(id, touch.event, touch.vector);
+        if(Touch.map.get(id)){ pointer.process([2, id, Touch.map.get(id)]);}
     },
     end: function(touch, pointer) {
         const id =  touch.event.pointerId
         Touch.process(id, touch.event, touch.vector);
-        pointer.onMessage/* self.postMessage */(Touch.map.get(id));
+        pointer.process([3, id, Touch.map.get(id)]);
         Touch.map.delete(id);
     },
     process: function(id, event, vectors) {
@@ -51,6 +53,7 @@ export let Touch = {
         if (result) {
             result.length++;
             result.targets.push(event.target)
+            result.vectors.push(vectors)
             vectors.forEach(function(vector, index) {
                 let data_block = result.data[index]
                 data_block.stroke.push(vector)
@@ -86,5 +89,6 @@ export let Touch = {
     
             });   
         }
-    }
+        return result
+    },
 };

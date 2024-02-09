@@ -12,7 +12,7 @@ export let Pointer = {
         element.addEventListener("pointercancel", Pointer.pointercancel, false);
         element.addEventListener("wheel", Pointer.wheel, false);
         // Pointer.worker = new Worker('text/javascript/ui/workers/pointer.js');
-        // Pointer.worker.onmessage = Pointer.onMessage;
+        // Pointer.worker.onmessage = Pointer.process;
         return Pointer; },
 
     pointerdown: function(event) {
@@ -30,7 +30,11 @@ export let Pointer = {
             // Pointer.map.set(event.pointerId, { s: 'o', x: event.clientX, y: event.clientX, f: event.pressure });
             Pointer.postMessage(event, 2, event.clientX, event.clientY, event.pressure);
         }
-        Pointer.pin(event) },
+        Pointer.pinhole(event)
+        if(this.pin){
+            this.pin.move(event)}
+
+     },
 
     pointerup: function(event) {
         event.preventDefault();
@@ -44,7 +48,7 @@ export let Pointer = {
         Pointer.postMessage(event, 4, event.clientX, event.clientY, event.pressure); },
 
     wheel: function(event) { // https://stackoverflow.com/questions/76150884/how-to-use-the-mouse-wheel-to-zoom-on-an-svg-using-the-viewbox
-            event.preventDefault();
+            // event.preventDefault();
             let scale = event.deltaY / 1000; // set the scaling factor (and make sure it's at least 10%)
             scale = Math.abs(scale) < .1 ? .1 * event.deltaY / Math.abs(event.deltaY) : scale;
             let svg = Pointer.element
@@ -59,38 +63,6 @@ export let Pointer = {
             svg.setAttribute('viewBox', `${x2} ${y2} ${width2} ${height2}`);
     },
         
-    postMessage: function(event, state, x, y, f) {
-        let [sx, sy] = SVG.true_coords(event);
-        var exyf = { event:event, state:state, vector:[JS.snap(sx), JS.snap(sy), f] };
-        const p_id = event.pointerId
-        const p_data = Pointer.map.get(p_id)
-        const cexy = [event.clientX, event.clientY]
-        if (state === 1) { 
-            Pointer.map.set(p_id, [[event.clientX, event.clientY]])
-            Touch.start(exyf, this); } 
-        else if (state === 2) { 
-            if (p_data){ 
-                p_data.push(cexy) 
-                Pointer.navigate(p_data)}
-            Touch.move(exyf, this); 
-        } 
-        else if (state === 3) { 
-            Pointer.map.delete(p_id)
-            Touch.end(exyf, this); }
-        else if (state === 4) { 
-            Pointer.map.delete(p_id)
-            Touch.end(exyf, this); }
-        // Pointer.worker.postMessage(exyf);
-    },
-    
-    pin: function(event) {
-        if(event.target.code?.type==="ring"){
-            let location = event.target.code.pinhole(event)
-            if(location){
-                Pointer.canistro.pointer.display(10, ...location)
-            }
-            /* console.log("ring deteced") */ } },
-
     navigate: function(path) {
         const svg = Pointer.element
         const delta = JS.slice(path, -3, -1)
@@ -102,13 +74,83 @@ export let Pointer = {
             let [nox, noy] = [ox+dx, oy+dy]
             svg.setAttribute('viewBox', [nox, noy, vx, vy].join(' ')) } },
 
-    onMessage: function(message) {
-        let data = message.data;
-        console.log(message);
-        if (data.type) {
-            if (data.type == 'debug') { log(data.msg); } 
-            else { var rate = Math.round(toMB(data.byteLength) / elapsed); } } 
-        else { } },
+    postMessage: function(event, state, x, y, f) {
+        let [sx, sy] = SVG.true_coords(event);
+        var exyf = { event:event, state:state, vector:[JS.snap(sx), JS.snap(sy), f] };
+        const p_id = event.pointerId
+        const p_data = Pointer.map.get(p_id)
+        const cexy = [event.clientX, event.clientY]
+        let touch, touchpoints;
+        if (state === 1) { 
+            Pointer.map.set(p_id, [[event.clientX, event.clientY]])
+            touch = Touch.start(exyf, this); } 
+        else if (state === 2) { 
+            if (p_data){ 
+                p_data.push(cexy) 
+                // Pointer.navigate(p_data)
+            }
+            touch = Touch.move(exyf, this);  } 
+        else if (state === 3) { 
+            Pointer.map.delete(p_id)
+            touch = Touch.end(exyf, this); 
+        }
+        else if (state === 4) { 
+            Pointer.map.delete(p_id)
+            touch = Touch.end(exyf, this); }
+        // Pointer.worker.postMessage(exyf);
+    },
+    
+    pinhole: function(event) {
+        if(event.target.code?.type==="ring"){
+            let pin_geo = event.target.code.pinhole(event)
+            if(pin_geo){
+                Pointer.canistro.pin.display(...pin_geo)
+            }
+            /* console.log("ring deteced") */ } },
+
+    touchpoints:function(result){
+        let target;
+        return result.targets.filter((x)=>{
+            let state = target!==x
+            target=x
+            return state }) 
+        return []
+    },
+    process: function(message) {
+        let [state, p_id, data] = message;
+        const p_data = Pointer.map.get(p_id)
+        let touchpoints = Pointer.touchpoints(data)
+        let touchpoints_length = touchpoints.length
+        let origin = touchpoints_length ? touchpoints[0].code : this.canistro
+        if (p_data){
+            if(origin?.type==="pin"){
+                if (state === 1) {} 
+                else if (state === 2) {  origin.move(p_data) } 
+                else if (state === 3) { }
+                else if (state === 4) { } }
+            else {
+                Pointer.navigate(p_data)
+            }
+        }
+        // if (state === 1) {} 
+        // else if (state === 2) { 
+        //     //  Pointer.navigate(p_data)
+        //     if (touchpoints_length==1){
+        //         // console.log(touchpoints)
+        //         // touchpoints[0].code?.move?.()
+        //         Pointer.navigate(p_data)
+        //     }
+        // } 
+        // else if (state === 3) { 
+        //     if (touchpoints_length==1){
+        //         console.log(touchpoints)
+        //         // this.pin = touchpoints[0].code
+        //         touchpoints[0].code?.pick?.() }
+        //     else{ 
+        //         // this.pin.drop()
+        //         this.pin = undefined }
+        //  }
+    },
         
     in: function(node, coords, selection) {
         if (node.children && node.children.length) {

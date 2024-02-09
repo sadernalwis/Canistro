@@ -8,6 +8,9 @@ export let JS = {
     start_end: function(array) { 
         const a_len = array.length
         if (a_len>1){ return [array[0], array[a_len-1]] }},
+    end: function(array) { 
+        const a_len = array.length
+        if (a_len>0){ return array[a_len-1] }},
     slice: function(array, start, end=-1) { 
         const a_len = array.length
         if (end<0){  end+=a_len }

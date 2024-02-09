@@ -217,14 +217,17 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
 		let y = (event.clientY - translation.y) / newScale;
         return [x,y]
 	},
-    true_coords:function(event, element) {
+    true_coords:function(event, element, matrix) {
         // pt.x = event.clientX;
         // pt.y = event.clientY;
         // var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse()); // The cursor point, translated into svg coordinates
         // console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
         const toSVGPoint = (svg, x, y) => {
             let p = new DOMPoint(x, y);
-            return p.matrixTransform(svg.getScreenCTM().inverse()); };
+            p = p.matrixTransform(svg.getScreenCTM().inverse()); 
+            if (matrix) { p = p.matrixTransform(new DOMMatrix(matrix/* "rotate(-1deg)" */))}
+            return p
+        };
         let cursorpt = toSVGPoint(element || event.target, event.clientX, event.clientY);
         return [cursorpt.x, cursorpt.y]
     },

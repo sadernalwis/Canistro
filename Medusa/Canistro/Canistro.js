@@ -110,14 +110,13 @@ export class Canistro/*  extends HTMLElement  */{
 
 		this.svg_root = svg_root
 		Pointer.init(this, this.svg_root)
-
 		// this.ring  = new Ring(this, "pointer")
 		// this.ring.attach(svg_root, null, svg_root)
 		this.ring  = new Canister(this, "canister")
 		this.ring.display(180)
-		this.pointer  = new Pin(this.canistro, `canistro-pointer`, 'pointer', 'pointer')
-		this.pointer.attach(svg_root, this.defs, svg_root)
-		this.pointer.display(10)
+		this.pin  = new Pin(this.canistro, `canistro-pointer`, 'pin', 'pin')
+		this.pin.attach(svg_root, this.defs, svg_root)
+		this.pin.display(10)
 		console.log('caniister.display()')
 		// this.ring.attach(svg_root, null, svg_root)
 
