@@ -17,7 +17,7 @@ export class Pin {
         const delta = JS.slice(path, -3, -1)
         if (delta.length==2){
             const [[sx, sy], [ex, ey]] = JS.slice(path, -3, -1)
-			let [fx, fy] = SVG.true_coords({target:this.svg_root, clientX:ex, clientY:ey}, undefined, "rotate(90deg)");
+			let [fx, fy] = SVG.true_coords({target:this.svg_root, clientX:ex, clientY:ey}, undefined/* , "rotate(90deg)" */);
 			let [px, py] = SVG.true_coords({target:this.svg_root, clientX:ex, clientY:ey});
 			this.display(undefined, fx, fy) 
 			const v3 = new THREE.Vector3(px, py)
@@ -78,11 +78,11 @@ export class Pin {
 			// transform       : `rotate(180deg)`,
 			animation       : `dash 2s ease-in-out infinite`,
 			transition		: 'all 250ms  ease  0ms'  } 
-			if(this.type==="ring"){styles['transform']=`rotate(180deg)`}
-			else if(this.type==="pin"){
-				styles['transform']=`rotate(-90deg)`
+			// if(this.type==="ring"){styles['transform']=`rotate(180deg)`}
+			// else if(this.type==="pin"){
+			// 	styles['transform']=`rotate(-90deg)`
 				delete styles['transition']
-			}
+			// }
 			return styles
 		}
 

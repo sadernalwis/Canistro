@@ -28,7 +28,7 @@ export class Canister {
 
 	build(){
 		const [svg_root, defs] = [this.canistro.svg_root, this.canistro.defs]
-		this.lens  = new Ring(this.canistro, `${this.name}-lens`, 'lens')
+		this.lens  = new Ring(this.canistro, this.name, 'lens')
 		this.methods  = new Ring(this.canistro, `${this.name}-methods`, 'methods')
 		this.parameters  = new Ring(this.canistro, `${this.name}-parameters`, 'parameters')
 		this.results  = new Ring(this.canistro, `${this.name}-results`, 'results')
@@ -40,7 +40,7 @@ export class Canister {
 
 	constructor(canistro, name){
 		this.canistro = canistro
-		this.name  = `canister-${name}`
+		this.name  = name//`canister-${name}`
 		this.html = {}
         this.node = this.build()
 	}

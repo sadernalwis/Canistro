@@ -4,6 +4,8 @@ import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
 import { CSS } from "Medusa/Parseltongue/CSS/CSS.js";
 import { JS } from "Medusa/Parseltongue/JS/JS.js";
 import { Boundary } from "Medusa/Parseltongue/Boundary/Boundary.js"
+import { Vector3 as V3, MathUtils as MU } from 'three';
+
 export class Ring {
 
 	get pin_range(){
@@ -31,48 +33,44 @@ export class Ring {
 
 	pinhole(event, orientation = "north"){
 		const radius = this.radius
-		const [px, py] = SVG.true_coords(event, event.srcTarget)
-		const a = px - this.x;
-		const b = py - this.y;
-		const distance = Math.sqrt( a*a + b*b );
-		var angle = Math.atan2(a, b)// * 180 / Math.PI;
-		const whole = Math.PI * 2
-		switch(orientation) { // Change where zero is located
-			case "west":
-				angle -= whole / 4
-				break
-			case "north":
-				angle += 0
-				break
-			case "east":
-				angle += whole / 4
-				break
-			case "south":            
-				angle += whole / 2
-				break }
-		angle = ((angle % whole) + whole) % whole // convert angle to range between 0 and 360 (although we’re working in radians, of course)
-		const degrees =  360-(angle * 180 / Math.PI) // returns angle in degrees
-		// const threhsold = this.radius-fit_rad
-		if ((radius-20)<distance && distance <radius){
-			const snap_deg = this.rad_deg(degrees)//JS.snap(degrees, this.pin_range)
-			let n_x = radius * Math.cos(snap_deg * Math.PI / 180);
-			let n_y = radius * Math.sin(snap_deg * Math.PI / 180);
-            // console.log(`${this.rad_idx(degrees)} ${this.label}ring deteced @ ${snap_deg}`)
-			return [this.pin_radius, n_x, n_y]
-		}
+		const [px, py] = SVG.true_coords(event, event.currentTarget)
+		let up = new V3(0,-1)
+		let ov = new V3(this.x, this.y)
+		let pv = new V3(px, py)
+		let dir = pv.clone().sub(ov)
+		let dir_norm = dir.clone().normalize()
+		let ang_rad = /* north */up.angleTo(dir_norm)
+		let ang = MU.radToDeg(ang_rad)
+		if (dir_norm.x<0){ ang = 360-ang}
+		ang = this.rad_deg(ang)
+		var v3 = up.multiply(new V3(0,radius));
+		var axis = new THREE.Vector3( 0, 0, 1 );
+		v3.applyAxisAngle( axis, MU.degToRad(ang) );
+		v3.add(ov)
+		const distance = dir.length();
+		console.log(ov, ang, distance)
+		if ((radius-20)<distance && distance <radius){ return [this.pin_radius, v3.x, v3.y] }
 	}
 
 	display(radius=100, x=0, y=0){
 		[this.radius, this.x, this.y] = [radius, x, y]
 		// const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
 		const attributes = {
-			r: this.radius, cx: this.x, cy: this.y,
+			r: this.radius, 
+			// cx: this.x, cy: this.y,
 			// style: `stroke-dashoffset:${circumference}`,
 			// strokeDasharray: `${circumference} ${circumference}`,
 			// strokeWidth: stroke,
 			fill: "transparent", stroke: '#e74c3c', }
+		// SVG.configure(this.progress_ring, attributes, true)
+		// SVG.configure(this.text, {x: this.x, y: this.y, 'transform':`rotate(180deg)`}, true)
+		// SVG.configure(this.path, {d:SVG.describe_arc( x, y, this.radius, 90, 270)}, true)
 		SVG.configure(this.progress_ring, attributes, true)
-		SVG.configure(this.path, {d:SVG.describe_arc( x, y, this.radius, 90, 270)}, true)
+		// SVG.configure(this.text, {'transform':`rotate(180deg)`}, true)
+		SVG.configure(this.path, {d:SVG.describe_arc( 0, 0, this.radius, 90, 270)}, true)
+		SVG.configure(this.group, {transform:`translate(${x} ${y})`}, true)
+
+		// transform="rotate(-10 50 100) translate(-36 45.5) skewX(40) scale(1 0.5)"
 		return this
 	}
 
@@ -89,11 +87,11 @@ export class Ring {
 			// transform       : `rotate(180deg)`,
 			animation       : `dash 2s ease-in-out infinite`,
 			transition		: 'all 250ms  ease  0ms'  } 
-			if(this.type==="ring"){styles['transform']=`rotate(180deg)`}
-			else if(this.type==="pointer"){
-				styles['transform']=`rotate(-90deg)`
-				// delete styles['transition']
-			}
+			// if(this.type==="ring"){styles['transform']=`rotate(180deg)`}
+			// else if(this.type==="pointer"){
+			// 	styles['transform']=`rotate(-90deg)`
+			// 	// delete styles['transition']
+			// }
 			return styles
 		}
 
@@ -128,10 +126,10 @@ export class Ring {
 		this.circle 	= SVG.make("circle", "progress-ring", [], {} )
 		// this.title 		= SVG.make("text",   "", [], { "pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.name)
 		this.progress_ring = SVG.make("circle", "progressring", [], {})
-		this.progress_text = SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', 'CANISTRO' )
+		this.progress_text = SVG.make("text",   "progress_text", [], { /* x: radius, y: radius,  */"pointer-events": 'none', fontSize:"18", textAnchor:"middle", dominantBaseline:"middle", fill:"black"}, '', this.name )
 		// let status_text   = SVG.put(svg_root, SVG.make("text",   "status_text",   [], this.status_attributes(radius),'', status ), 2, true);
 		SVG.style(this.progress_ring , this.style()); 
-		this.display()
+		// this.display()
 		console.log('ring.display()')
 		let that = this
 		this.progress_ring.code = this
@@ -143,6 +141,8 @@ export class Ring {
 		this.progress_ring.addEventListener("mouseenter", (e)=>{ that.progress_ring.style.fill = "white" })
 		this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })		
 		this.group 		= SVG.make('g','',[this.progress_ring, this.text, this.circle,/*  this.title, */ this.progress_text],{})
+		this.display()
+
 		// const ss = CSS.sheet(this.canistro.terminal.shadow_root, ".progressring", "fill:lightgrey")
 		// console.log(ss, ss.cssRules.length)
 		
@@ -151,7 +151,7 @@ export class Ring {
 	constructor(canistro, name, label, type="ring"){
 		this.canistro = canistro
 		this.pin_count = 64 
-		this.name  = `ring-${name}`
+		this.name  = name
 		this.label = label
 		this.type = type
 		this.radius = 100

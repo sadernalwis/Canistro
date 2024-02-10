@@ -86,9 +86,23 @@ export class Canistro/*  extends HTMLElement  */{
 	}
 
 	resize(svg_width, svg_height) {
-		SVG.configure(this.svg_root, {width:svg_width, height:svg_height, viewBox:`-${svg_width/2} -${svg_height/2} ${svg_width} ${svg_height}`, preserveAspectRatio:"xMidYMid meet"}, true)
-		
+		SVG.configure(this.svg_root, {width:svg_width, height:svg_height, viewBox:`-${svg_width/2} -${svg_height/2} ${svg_width} ${svg_height}`, preserveAspectRatio:"xMidYMid meet"}, true)	
 	}
+	
+	display(){
+		let [counter, count] = [0, Object.keys(this.canisters).length]
+		for (const canister_name in this.canisters){ 
+			const canister  = new Canister(this, canister_name)
+			var v3 = new THREE.Vector3(1000, 0, 0 );
+			var axis = new THREE.Vector3( 0, 0, 1 );
+			var deg = 360/count*counter;
+			var angle = deg * (Math.PI / 180);
+			v3.applyAxisAngle( axis, angle );
+			canister.display(180, v3.x, v3.y)
+			counter++
+		}
+	}
+
 	build(wrapper,svg_width=500, svg_height=500) {
 		// const radius = this.getAttribute('radius');
 		// const progress = this.getAttribute('progress');
@@ -112,8 +126,11 @@ export class Canistro/*  extends HTMLElement  */{
 		Pointer.init(this, this.svg_root)
 		// this.ring  = new Ring(this, "pointer")
 		// this.ring.attach(svg_root, null, svg_root)
+
+		// this.load_canisters()
 		this.ring  = new Canister(this, "canister")
 		this.ring.display(180)
+		this.display()
 		this.pin  = new Pin(this.canistro, `canistro-pointer`, 'pin', 'pin')
 		this.pin.attach(svg_root, this.defs, svg_root)
 		this.pin.display(10)
