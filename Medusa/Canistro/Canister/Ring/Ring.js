@@ -52,7 +52,7 @@ export class Ring {
 		if ((radius-20)<distance && distance <radius){ return [this.pin_radius, v3.x, v3.y] }
 	}
 
-	display(radius=100, x=0, y=0){
+	display(radius=10, x=0, y=0){
 		[this.radius, this.x, this.y] = [radius, x, y]
 		// const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
 		const attributes = {

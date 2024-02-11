@@ -3,10 +3,13 @@ import { HTML } from "Medusa/Parseltongue/HTML/HTML.js";
 import { SVG } from "Medusa/Parseltongue/SVG/SVG.js";
 import { CSS } from "Medusa/Parseltongue/CSS/CSS.js";
 import { JS } from "Medusa/Parseltongue/JS/JS.js";
-import * as THREE from 'three';
+import { Vector3 as V3, MathUtils as MU } from 'three';
 import { Path } from "../../Connector/Path/Path";
 
 export class Pin {
+	clear_path(){
+		this.points = []
+	}
 	pick(event){
 		this.pinned = !this.pinned
 		console.log('pin picked')
@@ -16,27 +19,39 @@ export class Pin {
 		// if (this.pinned){ console.log('pin moved')}
         const delta = JS.slice(path, -3, -1)
         if (delta.length==2){
+			let north = new V3(0,-1)
             const [[sx, sy], [ex, ey]] = JS.slice(path, -3, -1)
 			let [fx, fy] = SVG.true_coords({target:this.svg_root, clientX:ex, clientY:ey}, undefined/* , "rotate(90deg)" */);
 			let [px, py] = SVG.true_coords({target:this.svg_root, clientX:ex, clientY:ey});
 			this.display(undefined, fx, fy) 
-			const v3 = new THREE.Vector3(px, py)
+			const v3 = new V3(px, py)
 			if(this.points.length){
 				const start_end = JS.slice(this.points, -3, -1)//JS.start_end(this.points)
-				const end = JS.end(this.points)
-				let distance = Math.abs(v3.distanceTo(new THREE.Vector3(...end))) 
-				if (distance>100){ 
+				const origin = JS.end(this.points)
+				let distance = Math.abs(v3.distanceTo(new V3(...origin))) 
+				if (distance>200){ 
 					this.points.push(v3)
-					// let d = this.path.getAttribute('d')
-					// d+=`M${end[0]} ${end[1]} L${v3.x} ${v3.y}`
-					this.path.setAttribute('d', `M${end.x} ${end.y} L${v3.x} ${v3.y}`);
-				}
-				else{
-
-				}
+					const zaxis = new V3( 0, 0, 1 )
+					let dir = v3.clone().sub(origin)
+					let angle = north.angleTo(dir)
+					let deg = MU.radToDeg(angle)
+					if (dir.clone().normalize().x<0){ deg = 360-deg}
+					let snap_deg = Math.floor(deg / 45) * 45//JS.snap(deg, 45)
+					let deg_diff = deg-snap_deg
+					let o = origin
+					let e = v3
+					let d1 = e.clone().sub(o)
+					let nord = new V3(0, -d1.length())
+					dir = nord.applyAxisAngle( zaxis, MU.degToRad(deg_diff) )
+					let left_point = (deg_diff>(45/2)) ? dir.clone().add(new V3(-dir.x, dir.x)) : new V3(dir.x, -dir.x)
+					dir.applyAxisAngle( zaxis, MU.degToRad(snap_deg))
+					left_point.applyAxisAngle( zaxis, MU.degToRad(snap_deg))
+					let d = SVG.V2D( origin, left_point.add(o), dir.add(o))
+					let path = this.path.getAttribute('d')
+					this.path.setAttribute('d', path?(path+d): d) } 
 				// if(start_end.length){
 				// 	const [s, e] = start_end
-				// 	distance = v3.distanceTo(new THREE.Vector3(...e)) 
+				// 	distance = v3.distanceTo(new V3(...e)) 
 				// 	if (distance>10){
 				// 		const d = this.path.getAttribute('d')
 				// 		d+=`M${s[0]} ${s[1]} L${e[0]} ${e[1]}`
@@ -52,7 +67,7 @@ export class Pin {
 	}
 
 
-	display(radius=100, x=0, y=0){
+	display(radius=10, x=0, y=0){
 		[this.radius, this.x, this.y] = [radius || this.radius, x, y]
 		// const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, this.stroke)
 		const attributes = {

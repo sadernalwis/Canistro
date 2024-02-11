@@ -122,13 +122,13 @@ export let Pointer = {
         let touchpoints = Pointer.touchpoints(data)
         let touchpoints_length = touchpoints.length
         let origin = touchpoints_length ? touchpoints[0].code : this.canistro
-        if (p_data){
+        if (p_data || state === 3){
             if(origin?.type==="pin"){
                 if (state === 1) {} 
-                else if (state === 2) {  origin.move(p_data) } 
-                else if (state === 3) { }
-                else if (state === 4) { } }
-            else {
+                else if (state === 2) { origin.move(p_data) } 
+                else if (state === 3) { origin.clear_path()}
+                else if (state === 4) { origin.clear_path()} }
+            else if (p_data){
                 Pointer.navigate(p_data)
             }
         }

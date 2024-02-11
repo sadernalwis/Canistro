@@ -23,6 +23,13 @@ export let SVG = { //https://www.hongkiat.com/blog/svg-animations/
           }
     },
 
+    V2D: function(...vs) {
+        let d = ""
+        for (const v of vs){ 
+            d+= (d!=="" ? 'L ' : 'M')
+            d+= `${v.x} ${v.y} ` }
+        return d
+    },
     draw_line: function(element, array, offset) {
         if(array!=null && array.length){ 
             element.setAttribute("stroke-dasharray", array.join(','));}
