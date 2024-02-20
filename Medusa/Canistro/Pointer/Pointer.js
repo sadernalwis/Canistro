@@ -31,8 +31,7 @@ export let Pointer = {
             Pointer.postMessage(event, 2, event.clientX, event.clientY, event.pressure);
         }
         Pointer.pinhole(event)
-        if(this.pin){
-            this.pin.move(event)}
+        // if(this.pin){ this.pin.move(event)}
 
      },
 
@@ -102,9 +101,11 @@ export let Pointer = {
     
     pinhole: function(event) {
         if(event.target.code?.type==="ring"){
-            let pin_geo = event.target.code.pinhole(event)
+            let ring = event.target.code
+            let pin_geo = ring.pinhole(event)
             if(pin_geo){
-                Pointer.canistro.pin.display(...pin_geo)
+                ring.pin.display(...pin_geo)
+                // Pointer.canistro.pin.display(...pin_geo)
             }
             /* console.log("ring deteced") */ } },
 
@@ -128,9 +129,12 @@ export let Pointer = {
                 else if (state === 2) { origin.move(p_data) } 
                 else if (state === 3) { origin.clear_path()}
                 else if (state === 4) { origin.clear_path()} }
-            else if (p_data){
-                Pointer.navigate(p_data)
-            }
+            // else if (p_data){
+            //     Pointer.navigate(p_data)
+            // }
+        }
+        if (p_data && !origin){
+            Pointer.navigate(p_data)
         }
         // if (state === 1) {} 
         // else if (state === 2) { 

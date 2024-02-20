@@ -24,6 +24,7 @@ export class Terminal extends HTMLElement {
 
 	render(){ 
 		this.panel?.render()
+		this.canistro?.canistro.tick?.()
 	}
 
 	mousemove(x,y){

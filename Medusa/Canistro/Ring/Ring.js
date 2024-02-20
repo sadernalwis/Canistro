@@ -5,6 +5,7 @@ import { CSS } from "Medusa/Parseltongue/CSS/CSS.js";
 import { JS } from "Medusa/Parseltongue/JS/JS.js";
 import { Boundary } from "Medusa/Parseltongue/Boundary/Boundary.js"
 import { Vector3 as V3, MathUtils as MU } from 'three';
+import { Pin } from "../Pointer/Pin/Pin";
 
 export class Ring {
 
@@ -49,7 +50,11 @@ export class Ring {
 		v3.add(ov)
 		const distance = dir.length();
 		console.log(ov, ang, distance)
-		if ((radius-20)<distance && distance <radius){ return [this.pin_radius, v3.x, v3.y] }
+		if ((radius-20)<distance && distance <radius){ 
+                // this.pin.display(this.pin_radius, v3.x, v3.y)
+            // }
+			return [this.pin_radius, v3.x, v3.y] 
+		}
 	}
 
 	display(radius=10, x=0, y=0){
@@ -111,6 +116,8 @@ export class Ring {
 		this.wrapper = wrapper
 		defs ? SVG.put(defs, this.path,  0, false) : SVG.put(svg_root, this.def,  0, false) ;
 		SVG.put(wrapper, this.group, -1, false);
+		this.pin.attach(this.svg_root, this.defs, this.svg_root)
+		// [this.pin.svg_root, this.pin.defs] = [this.svg_root, this.defs]
 		return this
 	}
 
@@ -141,6 +148,7 @@ export class Ring {
 		this.progress_ring.addEventListener("mouseenter", (e)=>{ that.progress_ring.style.fill = "white" })
 		this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })		
 		this.group 		= SVG.make('g','',[this.progress_ring, this.text, this.circle,/*  this.title, */ this.progress_text],{})
+		this.pin  = new Pin(this.canistro, `${this.name}-pin`, 'pin', 'pin')
 		this.display()
 
 		// const ss = CSS.sheet(this.canistro.terminal.shadow_root, ".progressring", "fill:lightgrey")
@@ -148,6 +156,9 @@ export class Ring {
 		
 	}
 
+	tick(){	
+		this.pin.tick()
+	}
 	constructor(canistro, name, label, type="ring"){
 		this.canistro = canistro
 		this.pin_count = 64 

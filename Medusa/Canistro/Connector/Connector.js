@@ -80,6 +80,24 @@ export class Connector {
 		// console.log(ss, ss.cssRules.length)
 		/* 
 
+
+************************************************************ // https://codepen.io/cssgrid/pen/XWyrVGe
+<svg class="item" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">...<>
+        .item {
+            offset-path: path("M1.5 83.9777C1.5 159.985 69.5106 183.452 154.064 183.452C236.902 178.856 294.681 53.8638 209.367 83.9777C133.285 120.676 166.19 205.338 236.902 213.799C305.875 222.053 312.574 157.661 328.889 106.821C345.82 54.0581 370.867 13.7526 428.473 2.03607C473.965 -7.21664 534.556 71.326 609 20.7776");
+            width: 38px;
+            height: auto;
+            offset-distance: var(--distance);
+            position: absolute;
+            inset: 0;
+        }
+        
+    <svg width="610" height="216" viewBox="0 0 610 216" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1.5 83.9777C1.5 159.985 69.5106 183.452 154.064 183.452C236.902 178.856 294.681 53.8638 209.367 83.9777C133.285 120.676 166.19 205.338 236.902 213.799C305.875 222.053 312.574 157.661 328.889 106.821C345.82 54.0581 370.867 13.7526 428.473 2.03607C473.965 -7.21664 534.556 71.326 609 20.7776" stroke="white" stroke-width="1.14771" stroke-linecap="round" stroke-dasharray="9.65 9.65"/>
+        </svg>
+<input value="0" id="distance" min="0" max="100" type="range">
+document.documentElement.style.setProperty('--distance', `${event.currentTarget.value}%`);
+************************************************************        
 @keyframes draw {
   to {
     stroke-dashoffset: 0;

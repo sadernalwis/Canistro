@@ -89,19 +89,6 @@ export class Canistro/*  extends HTMLElement  */{
 		SVG.configure(this.svg_root, {width:svg_width, height:svg_height, viewBox:`-${svg_width/2} -${svg_height/2} ${svg_width} ${svg_height}`, preserveAspectRatio:"xMidYMid meet"}, true)	
 	}
 	
-	display(){
-		let [counter, count] = [0, Object.keys(this.canisters).length]
-		for (const canister_name in this.canisters){ 
-			const canister  = new Canister(this, canister_name)
-			var v3 = new THREE.Vector3(1000, 0, 0 );
-			var axis = new THREE.Vector3( 0, 0, 1 );
-			var deg = 360/count*counter;
-			var angle = deg * (Math.PI / 180);
-			v3.applyAxisAngle( axis, angle );
-			canister.display(180, v3.x, v3.y)
-			counter++
-		}
-	}
 
 	build(wrapper,svg_width=500, svg_height=500) {
 		// const radius = this.getAttribute('radius');
@@ -128,9 +115,9 @@ export class Canistro/*  extends HTMLElement  */{
 		// this.ring.attach(svg_root, null, svg_root)
 
 		// this.load_canisters()
-		this.ring  = new Canister(this, "canister")
+		this.ring  = new Canister(this, "canister", true)
 		this.ring.display(180)
-		this.display()
+		// this.display()
 		this.pin  = new Pin(this.canistro, `canistro-pointer`, 'pin', 'pin')
 		this.pin.attach(svg_root, this.defs, svg_root)
 		this.pin.display(10)
@@ -168,6 +155,12 @@ export class Canistro/*  extends HTMLElement  */{
 		}, 1000);
 	}
 
+	tick(){
+		// for (const [cid, canister] of this.canisters){  canister.tick() }
+		// for (const connector of this.connectors){  connector.tick() }
+		for (const [cid, canister] of Object.entries(Canister.canisters)){  canister.tick() }
+	}
+
 	constructor(terminal) {
 		// super();
 		this.terminal = terminal
@@ -180,32 +173,48 @@ export class Canistro/*  extends HTMLElement  */{
 		this.canisters = {} 
 		this.modules = {} 
 		this.actors = {} 
+		this.connectors = []
 		this.load_canisters()
 		this.load_modules()
 	}
 
-	async client(){
-		this.auth_client = this.auth_client || await AuthClient.create(Canistro.options.create)
-		return this.auth_client
-	}
 	async load_canisters(){
 		for (const key in process.env){ 
 			if(key.startsWith("CANISTER_ID_")){
 				const cid = process.env[key]
 				if (cid !== process.env.CANISTER_ID){
 					const ckey = key.replace("CANISTER_ID_",'').toLowerCase()
-					this.canisters[ckey] = cid  } } } }
+					this.canisters[ckey] = [cid]  } } } }
 
+	build_canisters(){
+		let [counter, count] = [0, Object.keys(this.canisters).length]
+		for (const canister_name in this.canisters){ 
+			const canister  = new Canister(this, canister_name)
+			var v3 = new THREE.Vector3(1000, 0, 0 );
+			var axis = new THREE.Vector3( 0, 0, 1 );
+			var deg = 360/count*counter;
+			var angle = deg * (Math.PI / 180);
+			v3.applyAxisAngle( axis, angle );
+			canister.display(180, v3.x, v3.y)
+			this.canisters[canister_name].push(canister)
+			counter++
+		}
+	}
 	async load_modules(){
 		window.IDL = IDL
 		for (const canister_name in this.canisters){ 
-			try {
-				// const module = await import(`/${"Canistro/Declarations"}/${canister_name}`/* @vite-ignore */)
+			try { // const module = await import(`/${"Canistro/Declarations"}/${canister_name}`/* @vite-ignore */)
 				const module = await import(`/${"Canistro/Declarations"}/${canister_name}`/* @vite-ignore */)
-				// modules['whoami'].idlFactory({ IDL: IDL })._fields[0][1].accept
 				this.modules[canister_name] = module } 
-			catch (error) { console.info(`NO CANDID for ${canister_name}`)} } } 
-				
+			catch (error) { console.info(`NO CANDID for ${canister_name}`)} }
+		this.build_canisters()
+	} 
+	
+	async client(){
+		this.auth_client = this.auth_client || await AuthClient.create(Canistro.options.create)
+		return this.auth_client
+	}
+
 	async actor(caller_ident, canister_name){
 		if (canister_name in this.actors){ 
 			let [actor_ident, actor] = this.actors[canister_name]
@@ -213,7 +222,7 @@ export class Canistro/*  extends HTMLElement  */{
 		const { canisterId, createActor} = this.modules[canister_name]//await import(`/${"Canistro/Declarations"}/${canister_name}`/* @vite-ignore */)
 		const client = await this.client()
 		const identity = await client.getIdentity()
-		const authenticated = await client.isAuthenticated()
+		// const authenticated = await client.isAuthenticated()
 		const actor = createActor(canisterId, { agentOptions: { identity, }, })
 		this.actors[canister_name] = [identity, actor];
 		return actor
