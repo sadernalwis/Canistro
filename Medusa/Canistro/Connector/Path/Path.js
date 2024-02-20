@@ -158,3 +158,5 @@ export function PathRounder(pathString, radius, useFractionalRadius) { // https:
 	else { resultCommands = commands; }
 	return resultCommands.reduce(function (str, c) { return str + c.join(" ") + " "; }, "");
 }
+
+
