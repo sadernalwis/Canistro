@@ -123,10 +123,14 @@ export let Pointer = {
         let touchpoints = Pointer.touchpoints(data)
         let touchpoints_length = touchpoints.length
         let origin = touchpoints_length ? touchpoints[0].code : this.canistro
+        let destin = JS.end(touchpoints)
+        if(touchpoints.length){
+            // console.log(touchpoints) 
+        }
         if (p_data || state === 3){
             if(origin?.type==="pin"){
                 if (state === 1) {} 
-                else if (state === 2) { origin.move(p_data) } 
+                else if (state === 2) { origin.move(p_data, (destin.code?.type==='ring')? destin.code : undefined) } 
                 else if (state === 3) { origin.clear_path()}
                 else if (state === 4) { origin.clear_path()} }
             // else if (p_data){

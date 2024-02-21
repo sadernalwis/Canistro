@@ -9,22 +9,33 @@ import { Pin } from "../Pointer/Pin/Pin";
 
 export class Ring {
 
-	get pin_range(){
-		return 360/this.pin_count
-	}
-
+	
 	get pin_radius(){
 		const [stroke, fit_rad, circumference] = SVG.ring_geometry(this.radius, 0)
 		return (circumference/this.pin_count/2)-1
 	}
-
-	rad_deg(angle){
-		return this.rad_idx(angle)*this.pin_range
+	
+	get origin(){ return new V3(this.x, this.y) }
+	pin_range(pin_count){ return 360/(pin_count?pin_count:this.pin_count) }
+	rad_idx(angle, pin_count){ return Math.floor(angle/this.pin_range(pin_count)) }
+	rad_deg(angle, pin_count){ return this.rad_idx(angle)*this.pin_range(pin_count) }
+	vclock(pv){ 
+		const ov = this.origin
+		let dir = pv.clone().sub(ov)
+		let dir_norm = dir.clone().normalize()
+		let ang_rad = Pin.north.angleTo(dir_norm)
+		let ang = MU.radToDeg(ang_rad)
+		if (dir_norm.x<0){ ang = 360-ang}
+		ang = this.rad_deg(ang)
+		var v3 = Pin.north.clone().multiply(new V3(0, this.radius));
+		v3.applyAxisAngle( Pin.zaxis, MU.degToRad(ang) );
+		v3.add(ov)
+		const distance = dir.length();
+		function clock(i){ return Math.round(i/2)*Boolean(i%15)} // Array(16).fill(-1).map((x,y) => Math.round(y/2)*Boolean(y%15) )
+		let c8 = clock(this.rad_idx(ang, 16))
+		return [ang, distance, v3, c8] 
 	}
 
-	rad_idx(angle){
-		return Math.floor(angle/this.pin_range)
-	}
 
 	rad_loc(angle){
 		const radius = this.radius
@@ -34,25 +45,11 @@ export class Ring {
 
 	pinhole(event, orientation = "north"){
 		const radius = this.radius
+		let [up,ov] = [new V3(0,-1), new V3(this.x, this.y)];
 		const [px, py] = SVG.true_coords(event, event.currentTarget)
-		let up = new V3(0,-1)
-		let ov = new V3(this.x, this.y)
 		let pv = new V3(px, py)
-		let dir = pv.clone().sub(ov)
-		let dir_norm = dir.clone().normalize()
-		let ang_rad = /* north */up.angleTo(dir_norm)
-		let ang = MU.radToDeg(ang_rad)
-		if (dir_norm.x<0){ ang = 360-ang}
-		ang = this.rad_deg(ang)
-		var v3 = up.multiply(new V3(0,radius));
-		var axis = new THREE.Vector3( 0, 0, 1 );
-		v3.applyAxisAngle( axis, MU.degToRad(ang) );
-		v3.add(ov)
-		const distance = dir.length();
-		console.log(ov, ang, distance)
+		const [ang, distance, v3] = this.vclock(pv)
 		if ((radius-20)<distance && distance <radius){ 
-                // this.pin.display(this.pin_radius, v3.x, v3.y)
-            // }
 			return [this.pin_radius, v3.x, v3.y] 
 		}
 	}
@@ -149,6 +146,7 @@ export class Ring {
 		this.progress_ring.addEventListener("mouseleave", (e)=>{ that.progress_ring.style.fill = "lightgrey" })		
 		this.group 		= SVG.make('g','',[this.progress_ring, this.text, this.circle,/*  this.title, */ this.progress_text],{})
 		this.pin  = new Pin(this.canistro, `${this.name}-pin`, 'pin', 'pin')
+		this.pin.ring = this
 		this.display()
 
 		// const ss = CSS.sheet(this.canistro.terminal.shadow_root, ".progressring", "fill:lightgrey")
