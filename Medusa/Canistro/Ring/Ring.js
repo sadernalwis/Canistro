@@ -17,25 +17,33 @@ export class Ring {
 	
 	get origin(){ return new V3(this.x, this.y) }
 	pin_range(pin_count){ return 360/(pin_count?pin_count:this.pin_count) }
-	rad_idx(angle, pin_count){ return Math.floor(angle/this.pin_range(pin_count)) }
-	rad_deg(angle, pin_count){ return this.rad_idx(angle)*this.pin_range(pin_count) }
-	vclock(pv){ 
+	ang_idx(angle, pin_count){ return Math.floor(angle/this.pin_range(pin_count)) }
+	idx_ang(idx, pin_count){ return idx*this.pin_range(pin_count) }
+	idx_vec(idx, pin_count){ 
+		const ang = this.idx_ang(idx, pin_count)
+		var v3 = Pin.north.clone().multiply(new V3(0, this.radius));
+		v3.applyAxisAngle( Pin.zaxis, MU.degToRad(ang) );
+		return v3.add(this.origin) }
+
+	snap_ang(angle, pin_count){ 
+		const idx = this.ang_idx(angle)
+		const s_ang = idx*this.pin_range(pin_count)
+		return [idx, s_ang] }
+
+	v3clock(pv){ 
 		const ov = this.origin
 		let dir = pv.clone().sub(ov)
 		let dir_norm = dir.clone().normalize()
 		let ang_rad = Pin.north.angleTo(dir_norm)
 		let ang = MU.radToDeg(ang_rad)
 		if (dir_norm.x<0){ ang = 360-ang}
-		ang = this.rad_deg(ang)
-		var v3 = Pin.north.clone().multiply(new V3(0, this.radius));
-		v3.applyAxisAngle( Pin.zaxis, MU.degToRad(ang) );
-		v3.add(ov)
+		const [idx, s_ang] = this.snap_ang(ang)
+		const v3 = this.idx_vec(idx)
 		const distance = dir.length();
 		function clock(i){ return Math.round(i/2)*Boolean(i%15)} // Array(16).fill(-1).map((x,y) => Math.round(y/2)*Boolean(y%15) )
-		let c8 = clock(this.rad_idx(ang, 16))
-		return [ang, distance, v3, c8] 
+		let c8 = clock(this.ang_idx(s_ang, 16))
+		return [idx, s_ang, distance, v3, c8] 
 	}
-
 
 	rad_loc(angle){
 		const radius = this.radius
@@ -45,10 +53,9 @@ export class Ring {
 
 	pinhole(event, orientation = "north"){
 		const radius = this.radius
-		let [up,ov] = [new V3(0,-1), new V3(this.x, this.y)];
 		const [px, py] = SVG.true_coords(event, event.currentTarget)
 		let pv = new V3(px, py)
-		const [ang, distance, v3] = this.vclock(pv)
+		const [idx, ang, distance, v3] = this.v3clock(pv)
 		if ((radius-20)<distance && distance <radius){ 
 			return [this.pin_radius, v3.x, v3.y] 
 		}
