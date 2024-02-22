@@ -17,7 +17,7 @@ export class Ring {
 	
 	get origin(){ return new V3(this.x, this.y) }
 	pin_range(pin_count){ return 360/(pin_count?pin_count:this.pin_count) }
-	ang_idx(angle, pin_count){ return Math.floor(angle/this.pin_range(pin_count)) }
+	ang_idx(angle, pin_count){ return Math.round(angle/this.pin_range(pin_count)) }
 	idx_ang(idx, pin_count){ return idx*this.pin_range(pin_count) }
 	idx_vec(idx, pin_count){ 
 		const ang = this.idx_ang(idx, pin_count)
@@ -41,7 +41,7 @@ export class Ring {
 		const v3 = this.idx_vec(idx)
 		const distance = dir.length();
 		function clock(i){ return Math.round(i/2)*Boolean(i%15)} // Array(16).fill(-1).map((x,y) => Math.round(y/2)*Boolean(y%15) )
-		let c8 = clock(this.ang_idx(s_ang, 16))
+		let c8 = clock(Math.floor(s_ang/this.pin_range(16)))
 		return [idx, s_ang, distance, v3, c8] 
 	}
 
@@ -57,7 +57,9 @@ export class Ring {
 		let pv = new V3(px, py)
 		const [idx, ang, distance, v3] = this.v3clock(pv)
 		if ((radius-20)<distance && distance <radius){ 
-			return [this.pin_radius, v3.x, v3.y] 
+			this.pin.display(this.pin_radius, v3.x, v3.y)
+			this.pin.ring_idx = idx
+			// return [this.pin_radius, v3.x, v3.y] 
 		}
 	}
 

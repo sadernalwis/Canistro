@@ -104,7 +104,7 @@ export let Pointer = {
             let ring = event.target.code
             let pin_geo = ring.pinhole(event)
             if(pin_geo){
-                ring.pin.display(...pin_geo)
+                // ring.pin.display(...pin_geo)
                 // Pointer.canistro.pin.display(...pin_geo)
             }
             /* console.log("ring deteced") */ } },
@@ -129,9 +129,13 @@ export let Pointer = {
         }
         if (p_data || state === 3){
             if(origin?.type==="pin"){
+                const dest_pin = (destin.code?.type==='pin' && destin.code!==origin)? destin.code : undefined
                 if (state === 1) {} 
-                else if (state === 2) { origin.move(p_data, (destin.code?.type==='ring')? destin.code : undefined) } 
-                else if (state === 3) { origin.clear_path()}
+                else if (state === 2) { 
+                    origin.move(p_data, dest_pin) } 
+                else if (state === 3) { 
+                    origin.drop(p_data, dest_pin)
+                    origin.clear_path()}
                 else if (state === 4) { origin.clear_path()} }
             // else if (p_data){
             //     Pointer.navigate(p_data)

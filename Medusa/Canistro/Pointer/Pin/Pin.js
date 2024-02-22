@@ -31,10 +31,20 @@ export class Pin {
 		// let i = 1
 		return [((i%8)%8)+1, i, (((i<2 ? 8-i : i-2))%8)+1]
 	}
-	pinsteps(o_slant, n){
+
+	needle(pin_ring){
+		let [pin, ring] = pin_ring ? [pin_ring.pin, pin_ring] : [this, this.ring]
+		const pv3 = ring.idx_vec(pin.ring_idx)
+		const [idx, s_ang, distance, v3, c8] = ring.v3clock(pv3)
+		// console.log(idx, c8, s_ang, distance, v3, pv3)
+		console.log(idx)//, c8, s_ang, distance, v3, pv3)
+		return v3
+	}
+
+	pinsteps(o_slant, n, force){
 		let [[o, slant], m ] = [o_slant, undefined]
 		let distance = Math.abs(n.distanceTo(new V3(...o))) 
-		if (distance>200){ 
+		if (distance>200 || force){ 
 			let dir = n.clone().sub(o)
 			let angle = Pin.north.angleTo(dir)
 			let deg = MU.radToDeg(angle)
@@ -74,24 +84,61 @@ export class Pin {
 		}
 	}
 	move(path, ring){
-		if (ring){ console.log(ring)}
+		// if (ring){ console.log(ring)}
         const delta = JS.slice(path, -3, -1)
         if (delta.length==2){
-            const [[sx, sy], [ex, ey]] = JS.slice(path, -3, -1)
+            const [[sx, sy], [ex, ey]] = delta//JS.slice(path, -3, -1)
 			let [fx, fy] = SVG.true_coords({target:this.svg_root, clientX:ex, clientY:ey}, undefined/* , "rotate(90deg)" */);
 			this.display(undefined, fx, fy) 
 			let [o_slant,m,n] = [JS.end(this.points), undefined, new V3(fx, fy)]
 			if(o_slant){
 				let pinsteps = this.pinsteps(o_slant, n)
 				if (pinsteps) { this.points.push(...pinsteps)} }
-			else{ this.points.push([n, undefined]) }
+			else{ 
+				n = this.needle()
+				const [idx, s_ang, distance, v3, c8] = this.ring.v3clock(n)
+				var nn = Pin.north.clone().multiply(new V3(0, 50));
+				nn.applyAxisAngle( Pin.zaxis, MU.degToRad(45*c8))
+				console.log(c8)
+				nn.add(n)
+				this.points.push([n, undefined]) 
+				this.points.push([nn, c8+1]) 
+			}
 			const d =this.points.map((p)=>p[0])
 			this.path.setAttribute('d', SVG.V2D( ...d))
 			this.beads.setAttribute('d', SVG.V2D( ...d)) /* ('d', PathRounder(SVG.V2D( ...this.points), 0.1, true)) */
 			return
 	} }
 
-	drop(event){
+	drop(path, pin){
+		if(pin){ 
+			const nv3 = pin.needle()
+			const [idx, s_ang, distance, v3, c8] = pin.ring.v3clock(nv3)
+			var nn = Pin.north.clone().multiply(new V3(0, 50));
+			nn.applyAxisAngle( Pin.zaxis, MU.degToRad(45*c8))
+			nn.add(nv3)
+			let [pv3_slant, n_points] = [undefined, []]
+			for (const v3_slant of this.points) {
+				const [v3, slant] = v3_slant
+				if(pv3_slant){
+					const [pv3, pslant] = pv3_slant
+					const p_dist = pv3.distanceTo(nn)
+					const v_dist = v3.distanceTo(nn)
+					let pinsteps = this.pinsteps(pv3_slant, nn, true)
+					if (p_dist<v_dist || (p_dist>=200 && v_dist<200)){
+						n_points.push(...pinsteps)
+						break
+					}
+				}
+				n_points.push(v3_slant)
+				pv3_slant = v3_slant
+			}
+			n_points.push([nv3, c8-4])
+			this.points = n_points
+			const d =this.points.map((p)=>p[0])
+			this.path.setAttribute('d', SVG.V2D( ...d))
+			this.beads.setAttribute('d', SVG.V2D( ...d)) /* ('d', PathRounder(SVG.V2D( ...this.points), 0.1, true)) */
+		}
 		this.pinned = true
 		console.log('pin dropped')
 	}
